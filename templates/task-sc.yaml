@@ -20,35 +20,34 @@ spec:
       type: string
       description: |
         Destination Registry URL
-    - name: SOURCE_AUTH_USERNAME
-      type: string
-      description: |
-        Source Registry Username for authentication
-    - name: SOURCE_AUTH_PASSWORD
-      type: string
-      description: |
-        Source Registry Password for authentication
-    - name: DESTINATION_AUTH_USERNAME
-      type: string
-      description: |
-        Destination Registry Username for authentication
-    - name: DESTINATION_AUTH_PASSWORD
-      type: string
-      description: |
-        Destination Registry Password for authentication
   steps:
-    - name: login-src
-      image: quay.io/skopeo/stable:latest
-      script: |
-        skopeo login docker.io -u=$(params.SOURCE_AUTH_USERNAME) -p=$(params.SOURCE_AUTH_PASSWORD)
-    - name: login-dest
-      image: quay.io/skopeo/stable:latest
-      script: |
-        skopeo login docker.io -u=$(params.DESTINATION_AUTH_USERNAME) -p=$(params.DESTINATION_AUTH_PASSWORD)
+    # - name: login-src
+    #   image: quay.io/skopeo/stable:latest
+    #   script: |
+    #     skopeo login docker.io -u=$(params.SOURCE_AUTH_USERNAME) -p=$(params.SOURCE_AUTH_PASSWORD)
+    # - name: login-dest
+    #   image: quay.io/skopeo/stable:latest
+    #   script: |
+    #     skopeo login docker.io -u=$(params.DESTINATION_AUTH_USERNAME) -p=$(params.DESTINATION_AUTH_PASSWORD)
     - name: copy
-      image: quay.io/skopeo/stable:latest
-      script: |
-        skopeo copy --src-creds $(params.SOURCE_AUTH_USERNAME):$(params.SOURCE_AUTH_PASSWORD) \
-        docker://$(params.SOURCE_REGISTRY) --dest-creds $(params.DESTINATION_AUTH_USERNAME):$(params.DESTINATION_AUTH_PASSWORD) \
-        docker://$(params.DESTINATION_REGISTRY)
-
+      image: quay.io/skopeo/stable
+      command:
+        - sh
+        - -c
+        - |
+          skopeo copy --src-creds=$(cat /var/run/secrets/sc-secret/username):$(cat /var/run/secrets/sc-secret/password) \
+          --dest-creds=$(cat /var/run/secrets/sc-secret/username):$(cat /var/run/secrets/sc-secret/password) \
+          docker://$(params.SOURCE_REGISTRY) docker://$(params.DESTINATION_REGISTRY)
+    # - name: copy
+    #   image: quay.io/skopeo/stable:latest
+    #   script: |
+    #     skopeo copy --src-creds $(params.SOURCE_AUTH_USERNAME):$(params.SOURCE_AUTH_PASSWORD) \
+    #     docker://$(params.SOURCE_REGISTRY) --dest-creds $(params.DESTINATION_AUTH_USERNAME):$(params.DESTINATION_AUTH_PASSWORD) \
+    #     docker://$(params.DESTINATION_REGISTRY)
+      volumeMounts:
+        - name: registry-secret
+          mountPath: /var/run/secrets/sc-secret
+  volumes:
+    - name: registry-secret
+      secret:
+        secretName: sc-secret

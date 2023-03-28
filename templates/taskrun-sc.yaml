@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: skopeo-copy-run
+spec:
+  serviceAccountName: sc-account
+  taskRef:
+    name: skopeo-copy
+  params:
+    - name: SOURCE_REGISTRY
+      value: <>             # eg - docker.io
+    - name: SOURCE_IMAGE
+      value: <>             # username/imageName
+    - name: SOURCE_TAG
+      value: latest         # By default
+    - name: DESTINATION_REGISTRY
+      value: <>
+    - name: DESTINATION_IMAGE
+      value: <>
+    - name: DESTINATION_TAG
+      value: latest
+

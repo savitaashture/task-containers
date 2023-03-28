@@ -15,35 +15,40 @@ spec:
     - name: SOURCE_REGISTRY
       type: string
       description: |
-        Source Registry URL
+        It represents the Source Registry, for eg - docker.io, quay.io, 
+        registry.fedoraproject.org, etc.
+    - name: SOURCE_IMAGE
+      type: string
+      description: |
+        It represents the particular Image in the Source Registry we want to copy.
+    - name: SOURCE_TAG
+      type: string
+      description: |
+        It represents the tag version of the Source Image. By default it is latest.
     - name: DESTINATION_REGISTRY
       type: string
       description: |
-        Destination Registry URL
+        It represents the Destination Registry, for eg - docker.io, quay.io, 
+        registry.fedoraproject.org, etc.
+    - name: DESTINATION_IMAGE
+      type: string
+      description: |
+        It represents the particular Image in the Source Registry we want to copy.
+    - name: DESTINATION_TAG
+      type: string
+      description: |
+        It represents the tag version of the Source Image. By default it is latest.
   steps:
-    # - name: login-src
-    #   image: quay.io/skopeo/stable:latest
-    #   script: |
-    #     skopeo login docker.io -u=$(params.SOURCE_AUTH_USERNAME) -p=$(params.SOURCE_AUTH_PASSWORD)
-    # - name: login-dest
-    #   image: quay.io/skopeo/stable:latest
-    #   script: |
-    #     skopeo login docker.io -u=$(params.DESTINATION_AUTH_USERNAME) -p=$(params.DESTINATION_AUTH_PASSWORD)
     - name: copy
       image: quay.io/skopeo/stable
       command:
         - sh
         - -c
         - |
-          skopeo copy --src-creds=$(cat /var/run/secrets/sc-secret/username):$(cat /var/run/secrets/sc-secret/password) \
-          --dest-creds=$(cat /var/run/secrets/sc-secret/username):$(cat /var/run/secrets/sc-secret/password) \
-          docker://$(params.SOURCE_REGISTRY) docker://$(params.DESTINATION_REGISTRY)
-    # - name: copy
-    #   image: quay.io/skopeo/stable:latest
-    #   script: |
-    #     skopeo copy --src-creds $(params.SOURCE_AUTH_USERNAME):$(params.SOURCE_AUTH_PASSWORD) \
-    #     docker://$(params.SOURCE_REGISTRY) --dest-creds $(params.DESTINATION_AUTH_USERNAME):$(params.DESTINATION_AUTH_PASSWORD) \
-    #     docker://$(params.DESTINATION_REGISTRY)
+          skopeo copy --src-creds=$(cat /var/run/secrets/sc-secret/src_username):$(cat /var/run/secrets/sc-secret/src_password) \
+          --dest-creds=$(cat /var/run/secrets/sc-secret/dest_username):$(cat /var/run/secrets/sc-secret/dest_password) \
+          docker://$(params.SOURCE_REGISTRY)/$(params.SOURCE_IMAGE):$(params.SOURCE_TAG) \
+          docker://$(params.DESTINATION_REGISTRY)/$(params.DESTINATION_IMAGE):$(params.DESTINATION_TAG)
       volumeMounts:
         - name: registry-secret
           mountPath: /var/run/secrets/sc-secret

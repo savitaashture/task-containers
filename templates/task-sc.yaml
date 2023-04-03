@@ -41,18 +41,13 @@ spec:
   steps:
     - name: copy
       image: quay.io/skopeo/stable
-      command:
-        - sh
-        - -c
-        - |
-          skopeo copy --src-creds=$(cat /var/run/secrets/sc-secret/src_username):$(cat /var/run/secrets/sc-secret/src_password) \
-          --dest-creds=$(cat /var/run/secrets/sc-secret/dest_username):$(cat /var/run/secrets/sc-secret/dest_password) \
-          docker://$(params.SOURCE_REGISTRY)/$(params.SOURCE_IMAGE):$(params.SOURCE_TAG) \
-          docker://$(params.DESTINATION_REGISTRY)/$(params.DESTINATION_IMAGE):$(params.DESTINATION_TAG)
-      volumeMounts:
-        - name: registry-secret
-          mountPath: /var/run/secrets/sc-secret
-  volumes:
-    - name: registry-secret
-      secret:
-        secretName: sc-secret
+      imagePullPolicy: Always
+      command: ["skopeo"]
+      args:
+      - "copy"
+      - "docker://$(params.SOURCE_REGISTRY)/$(params.SOURCE_IMAGE):$(params.SOURCE_TAG)"
+      - "docker://$(params.DESTINATION_REGISTRY)/$(params.DESTINATION_IMAGE):$(params.DESTINATION_TAG)"
+      env:
+      - name: REGISTRY_AUTH_FILE
+        value: /root/.docker/config.json
+

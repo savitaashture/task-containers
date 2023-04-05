@@ -6,43 +6,18 @@ Skopeo is a command line tool for working with remote image registries.
 The copy command will take care of copying the image from internal.registry to production.registry. If your production registry requires credentials to login in order to push the image, skopeo can handle that as well.
 
 ### Steps to run the Task
-- Create a Kubernetes secrets containining credentials of the registries. Refer to [official Tekton documention](https://tekton.dev/docs/pipelines/auth/#configuring-docker-authentication-for-docker).
-    - <b>Method 1</b>  is to use existing `/home/username/.docker/config.json` (to create this, use `docker login` command). 
-      ```
-      kubectl create secret generic docker-registry \
-            --from-file=.dockerconfigjson=${HOME}/.docker/config.json \
-            --type=kubernetes.io/dockerconfigjson
-      ```
-      `config.json` will be having the following format:
-      ```
-      {
-        "auths": {
-          "https://url1.com": {
-            "auth": "$(echo -n user1:pass1 | base64)",
-            "email": "not@val.id",
-          },
-          "https://url2.com": {
-            "auth": "$(echo -n user2:pass2 | base64)",
-            "email": "not@val.id",
-          },
-          ...
-        }
-      }
-      ```
-      To setup via method 1, you can refer to [the official kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#log-in-to-docker-hub). 
-      ```
-    - <b>Method 2</b> involves parsing the registry information in the following command.
-      ```
-      kubectl create secret docker-registry ghcr-io \
-              --docker-server="ghcr.io" \
-              --docker-username="registry-username" \
-              --docker-password="registry-password"
-      ```
-      To setup via method 2, you can refer to [the official kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#log-in-to-docker-hub).  
+- Create a Kubernetes secrets containining credentials of the source and destination registries.  To create the Kubernetes secrets we can use the `kubectl create` command:
+  ```
+  kubectl create secret docker-registry <secret-name> \
+          --docker-server="ghcr.io" \
+          --docker-username="registry-username" \
+          --docker-password="registry-password"
+  ```
+  Refer to [official Tekton documention](https://tekton.dev/docs/pipelines/auth/).
 
-      <br />
-- We would need to pass the secret we just created to the service account. The Service Account ensures that the Kubernetes proxy the traffic of registry and automatically add the bearer tokens, so no further authentication will be required by the tasks using it. <br /> 
-To add the secrets to the service account we can add the secret to the service account using the `kubectl edit` commmand:<br />
+      
+- We would need to pass the secret we just created to the service account. The Service Account ensures that the Kubernetes proxy the traffic of registry and automatically add the bearer tokens, so no further authentication will be required by the tasks using it. 
+To add the secrets to the service account we can add the secret to the service account using the `kubectl edit` commmand:
   ```
   $ kubectl edit serviceaccount docker-serviceaccount
   ```

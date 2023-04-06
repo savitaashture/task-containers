@@ -50,5 +50,7 @@ To add the secrets to the service account we can add the secret to the service a
         value: <>
       - name: DESTINATION_TAG
         value: latest
+      - name: TLS_VERIFY
+        value: true
   ```
 - To check how the full image url must be called for different hosts, refer to [this blog](https://www.redhat.com/en/blog/be-careful-when-pulling-images-short-name).

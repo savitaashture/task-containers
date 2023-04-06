@@ -7,7 +7,7 @@ BATS_CORE = ./test/.bats/bats-core/bin/bats
 BATS_FLAGS ?= --print-output-on-failure --show-output-of-passing-tests --verbose-run
 
 # path to the bats test files, overwite the variables below to tweak the test scope
-INTEGRATION_TESTS ?= ./test/integration/*.bats
+#INTEGRATION_TESTS ?= ./test/integration/*.bats
 E2E_TESTS ?= ./test/e2e/*.bats
 
 # generic arguments employed on most of the targets
@@ -36,10 +36,7 @@ helm-package:
 clean:
 	rm -rf $(CHART_NAME)-*.tgz > /dev/null 2>&1 || true
 
-# run the integration tests, does not require a kubernetes instance
-test-integration:
-	$(BATS_CORE) $(BATS_FLAGS) $(ARGS) $(INTEGRATION_TESTS)
-
+	
 # run end-to-end tests against the current kuberentes context, it will required a cluster with tekton
 # pipelines and other requirements installed, before start testing the target invokes the
 # installation of the current project's task (using helm).

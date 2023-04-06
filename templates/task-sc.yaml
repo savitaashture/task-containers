@@ -38,6 +38,19 @@ spec:
       type: string
       description: |
         It represents the tag version of the Source Image. By default it is latest.
+    - name: TLS_VERIFY
+      type: string
+      default: "true"
+      description: |
+        Sets the global `http.tlsVerify` value, `false` is not advised unless
+        you trust the remote repository.
+  results:
+    - name: SOURCE_DIGEST
+      type: string
+      description: Source Image Digest
+    - name: DESTINATION_DIGEST
+      type: string
+      description: Destination Image Digest
   steps:
     - name: copy
       image: quay.io/skopeo/stable
@@ -45,9 +58,19 @@ spec:
       command: ["skopeo"]
       args:
       - "copy"
+      - "--tls-verify=$(params.TLS_VERIFY)"
       - "docker://$(params.SOURCE_REGISTRY)/$(params.SOURCE_IMAGE):$(params.SOURCE_TAG)"
       - "docker://$(params.DESTINATION_REGISTRY)/$(params.DESTINATION_IMAGE):$(params.DESTINATION_TAG)"
       env:
       - name: REGISTRY_AUTH_FILE
         value: /root/.docker/config.json
-
+    - name: store-digest
+      image: quay.io/skopeo/stable
+      script: |
+        SOURCE_DIGEST=$(skopeo inspect --tls-verify=$(params.TLS_VERIFY) --format='{{.Digest}}' docker://$(params.SOURCE_REGISTRY)/$(params.SOURCE_IMAGE):$(params.SOURCE_TAG)) 
+        DESTINATION_DIGEST=$(skopeo inspect --tls-verify=$(params.TLS_VERIFY) --format='{{.Digest}}' docker://$(params.DESTINATION_REGISTRY)/$(params.DESTINATION_IMAGE):$(params.DESTINATION_TAG)) 
+        echo $SOURCE_DIGEST > $(results.SOURCE_DIGEST.path)
+        echo $DESTINATION_DIGEST > $(results.DESTINATION_DIGEST.path)
+      env:
+      - name: REGISTRY_AUTH_FILE
+        value: /root/.docker/config.json

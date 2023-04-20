@@ -4,73 +4,79 @@ kind: Task
 metadata:
   name: skopeo-copy
   labels:
-    app.kubernetes.io/version: 0.0.1
+    app.kubernetes.io/version: {{ .Chart.Version }}
+{{- if .Values.annotations }}
+  annotations:
+  {{- .Values.annotations | toYaml | nindent 4 }}
+{{- end }}
 spec:
-  description: | 
-    Skopeo is a command line tool for working with remote image registries. 
-    The copy command will take care of copying the image from internal.registry 
-    to production.registry. If your production registry requires credentials to 
-    login in order to push the image, skopeo can handle that as well.
+  description: |
+    Uses `skopeo copy` to replicate the `SOURCE` (param) container image into
+    `DESTINATION`. After copying the source and destination images SHA256 digest
+    is stored as results.
+
   params:
-    - name: SOURCE_REGISTRY
+    - name: SOURCE
       type: string
       description: |
-        It represents the Source Registry, for eg - docker.io, quay.io, 
-        registry.fedoraproject.org, etc.
-    - name: SOURCE_IMAGE
+        Fully qualified source container image name, including tag, to be copied
+        into `DESTINATION` param.
+    - name: DESTINATION
       type: string
       description: |
-        It represents the particular Image in the Source Registry we want to copy.
-    - name: SOURCE_TAG
-      type: string
-      description: |
-        It represents the tag version of the Source Image. By default it is latest.
-    - name: DESTINATION_REGISTRY
-      type: string
-      description: |
-        It represents the Destination Registry, for eg - docker.io, quay.io, 
-        registry.fedoraproject.org, etc.
-    - name: DESTINATION_IMAGE
-      type: string
-      description: |
-        It represents the particular Image in the Source Registry we want to copy.
-    - name: DESTINATION_TAG
-      type: string
-      description: |
-        It represents the tag version of the Source Image. By default it is latest.
+        Fully qualified destination container image name, including tag.
     - name: TLS_VERIFY
       type: string
       default: "true"
       description: |
-        Sets the global `http.tlsVerify` value, `false` is not advised unless
-        you trust the remote repository.
+        Sets the TLS verification flags, `true` is recommended.
+    - name: VERBOSE
+      type: string
+      default: "false"
+      description: |
+        Shows a more verbose (debug) output.
+
   results:
     - name: SOURCE_DIGEST
       type: string
-      description: Source Image Digest
+      description: |
+        Source image SHA256 digest.
     - name: DESTINATION_DIGEST
       type: string
-      description: Destination Image Digest
+      description: |
+        Destination image SHA256 digest.
+
+  volumes:
+    - name: scripts-dir
+      emptyDir: {}
+
+  stepTemplate:
+    env:
+{{- $variables := list
+      "params.SOURCE"
+      "params.DESTINATION"
+      "params.TLS_VERIFY"
+      "params.VERBOSE"
+      "results.SOURCE_DIGEST.path"
+      "results.DESTINATION_DIGEST.path"
+}}
+{{- include "environment" ( list $variables ) | nindent 6 }}
+
   steps:
-    - name: copy
-      image: quay.io/skopeo/stable
-      imagePullPolicy: Always
-      command: ["skopeo"]
-      args:
-      - "copy"
-      - "--tls-verify=$(params.TLS_VERIFY)"
-      - "docker://$(params.SOURCE_REGISTRY)/$(params.SOURCE_IMAGE):$(params.SOURCE_TAG)"
-      - "docker://$(params.DESTINATION_REGISTRY)/$(params.DESTINATION_IMAGE):$(params.DESTINATION_TAG)"
-      env:
-      - name: REGISTRY_AUTH_FILE
-        value: /root/.docker/config.json
-    - name: store-digest
-      image: quay.io/skopeo/stable
-      script: |
-        SOURCE_DIGEST=$(skopeo inspect --tls-verify=$(params.TLS_VERIFY) --format='{{.Digest}}' docker://$(params.SOURCE_REGISTRY)/$(params.SOURCE_IMAGE):$(params.SOURCE_TAG)) 
-        DESTINATION_DIGEST=$(skopeo inspect --tls-verify=$(params.TLS_VERIFY) --format='{{.Digest}}' docker://$(params.DESTINATION_REGISTRY)/$(params.DESTINATION_IMAGE):$(params.DESTINATION_TAG)) 
-        echo $SOURCE_DIGEST > $(results.SOURCE_DIGEST.path)
-        echo $DESTINATION_DIGEST > $(results.DESTINATION_DIGEST.path)
-      env:
-      - name: REGISTRY_AUTH_FILE
-        value: /root/.docker/config.json
+{{- include "load_scripts" ( list . "skopeo-" ) | nindent 4 }}
+
+    - name: skopeo-copy
+      image: {{ .Values.images.skopeo }}
+      command:
+        - /scripts/skopeo-copy.sh
+      volumeMounts:
+        - name: scripts-dir
+          mountPath: /scripts
+
+    - name: skopeo-results
+      image: {{ .Values.images.skopeo }}
+      command:
+        - /scripts/skopeo-results.sh
+      volumeMounts:
+        - name: scripts-dir
+          mountPath: /scripts

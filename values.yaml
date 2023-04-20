@@ -1,1 +1,9 @@
 ---
+images:
+  bash: docker.io/library/bash:latest
+  skopeo: quay.io/skopeo/stable:latest
+
+annotations:
+  tekton.dev/pipelines.minVersion: "0.38.0"
+  tekton.dev/categories: containers
+  tekton.dev/tags: containers

@@ -10,10 +10,10 @@ BATS_FLAGS ?= --print-output-on-failure --show-output-of-passing-tests --verbose
 E2E_TESTS ?= ./test/e2e/*.bats
 
 # skopeo-copy task e2e test variables, source, destination url and tls-verify parameter.
-E2E_SC_PARAMS_SOURCE ?= "docker://docker.io/library/busybox:latest"
-E2E_SC_PARAMS_DESTINATION ?= "docker://registry.registry.svc.cluster.local:32222/busybox:latest"
+E2E_SC_PARAMS_SOURCE ?= docker://docker.io/library/busybox:latest
+E2E_SC_PARAMS_DESTINATION ?= docker://registry.registry.svc.cluster.local:32222/busybox:latest
 # setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
-E2E_SC_PARAMS_TLS_VERIFY ?= "false"
+E2E_SC_PARAMS_TLS_VERIFY ?= false
 
 # path to the github actions testing workflows
 ACT_WORKFLOWS ?= ./.github/workflows/test.yaml

@@ -2,16 +2,16 @@
 
 source ./test/helper/helper.sh
 
-PARAMS_SOURCE=$(echo ${E2E_SC_PARAMS_SOURCE:-} | tr -d '"')
-PARAMS_DESTINATION=$(echo ${E2E_SC_PARAMS_DESTINATION:-} | tr -d '"')
-PARAMS_TLS_VERIFY=$(echo ${E2E_SC_PARAMS_TLS_VERIFY:-} | tr -d '"')
+declare -rx E2E_SC_PARAMS_SOURCE="${E2E_SC_PARAMS_SOURCE:-}"
+declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
+declare -rx E2E_SC_PARAMS_TLS_VERIFY="${E2E_SC_PARAMS_TLS_VERIFY:-}"
 
 # Testing the skopeo-copy task,
 @test "[e2e] using the task to copy an image from remote public registry to local registry" {
     # asserting all required configuration is informed
-	[ -n "${PARAMS_SOURCE}" ]
-    [ -n "${PARAMS_DESTINATION}" ]
-    [ -n "${PARAMS_TLS_VERIFY}" ]
+	[ -n "${E2E_SC_PARAMS_SOURCE}" ]
+    [ -n "${E2E_SC_PARAMS_DESTINATION}" ]
+    [ -n "${E2E_SC_PARAMS_TLS_VERIFY}" ]
 
     # cleaning up all the existing resources before starting a new taskrun, the test assertion
 	# will describe the objects on the current namespace
@@ -23,9 +23,9 @@ PARAMS_TLS_VERIFY=$(echo ${E2E_SC_PARAMS_TLS_VERIFY:-} | tr -d '"')
     #
     
     run tkn task start skopeo-copy \
-        --param="SOURCE=${PARAMS_SOURCE}" \
-        --param="DESTINATION=${PARAMS_DESTINATION}" \
-        --param="TLS_VERIFY=${PARAMS_TLS_VERIFY}" \
+        --param="SOURCE=${E2E_SC_PARAMS_SOURCE}" \
+        --param="DESTINATION=${E2E_SC_PARAMS_DESTINATION}" \
+        --param="TLS_VERIFY=${E2E_SC_PARAMS_TLS_VERIFY}" \
         --param="VERBOSE=true" \
         --showlog
     assert_success

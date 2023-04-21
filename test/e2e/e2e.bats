@@ -2,14 +2,17 @@
 
 source ./test/helper/helper.sh
 
-export PARAMS_SOURCE="docker://docker.io/library/busybox:latest"
-export PARAMS_DESTINATION="docker://registry.registry.svc.cluster.local:32222/busybox:latest"
-
-# setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
-export PARAMS_TLS_VERIFY="false"
+PARAMS_SOURCE=$(echo ${E2E_SC_PARAMS_SOURCE:-} | tr -d '"')
+PARAMS_DESTINATION=$(echo ${E2E_SC_PARAMS_DESTINATION:-} | tr -d '"')
+PARAMS_TLS_VERIFY=$(echo ${E2E_SC_PARAMS_TLS_VERIFY:-} | tr -d '"')
 
 # Testing the skopeo-copy task,
 @test "[e2e] using the task to copy an image from remote public registry to local registry" {
+    # asserting all required configuration is informed
+	[ -n "${PARAMS_SOURCE}" ]
+    [ -n "${PARAMS_DESTINATION}" ]
+    [ -n "${PARAMS_TLS_VERIFY}" ]
+
     # cleaning up all the existing resources before starting a new taskrun, the test assertion
 	# will describe the objects on the current namespace
     run kubectl delete taskrun --all

@@ -1,0 +1,57 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildah
+spec:
+  description: |
+    Buildah task builds source into a container image and
+    then pushes it to a container registry.
+
+    Buildah Task builds source into a container image using Project Atomic's
+    Buildah build tool.It uses Buildah's support for building from Dockerfiles,
+    using its buildah bud command.This command executes the directives in the
+    Dockerfile to assemble a container image, then pushes that image to a
+    container registry.
+    
+  params:
+    - name: IMAGE
+      description: The name of the Docker image to build and push
+      type: string
+      default: my-image
+    - name: DOCKERFILE_PATH
+      description: The path to the Dockerfile
+      type: string
+      default: ./Dockerfile
+    - name: REGISTRY
+      description: The Docker registry to push the image to
+      type: string
+      default: my-registry.io
+    - name: CONTEXT
+      description: Path to the directory to use as context.
+      default: .
+  workspaces:
+  - name: source
+
+  steps:
+    - name: build
+      image: registry.access.redhat.com/ubi8/buildah:latest
+      workingDir: $(workspaces.source.path)
+      script: |
+        buildah bud -f ./Dockerfile -t $(params.IMAGE) .    
+      volumeMounts:
+        - name: scripts-dir
+          mountPath: /scripts
+      securityContext:
+        privileged: true
+    - name: push
+      workingDir: $(workspaces.source.path)
+      image: registry.access.redhat.com/ubi8/buildah
+      command:
+        - buildah
+        - push
+        - $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+    
+  volumes:
+  - name: scripts-dir
+    emptyDir: {}
+      

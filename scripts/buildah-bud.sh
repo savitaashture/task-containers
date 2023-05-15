@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+declare -rx PARAMS_IMAGE="${PARAMS_IMAGE:-}"
+declare -rx PARAMS_STORAGE_DRIVER="${PARAMS_STORAGE_DRIVER:-}"
+declare -rx PARAMS_CONTAINERFILE_PATH="${PARAMS_CONTAINERFILE_PATH:-}"
+declare -rx PARAMS_CONTEXT_SUBDIRECTORY="${PARAMS_CONTEXT_SUBDIRECTORY:-}"
+declare -rx PARAMS_TLS_VERIFY="${PARAMS_TLS_VERIFY:-}"
+declare -rx PARAMS_BUILD_EXTRA_ARGS="${PARAMS_BUILD_EXTRA_ARGS:-}"
+declare -rx PARAMS_PUSH_EXTRA_ARGS="${PARAMS_PUSH_EXTRA_ARGS:-}"
+declare -rx PARAMS_SKIP_PUSH="${PARAMS_SKIP_PUSH:-}"
+
+declare -rx RESULTS_IMAGE_DIGEST="${RESULTS_IMAGE_DIGEST:-}"
+declare -rx RESULTS_IMAGE_URL="${RESULTS_IMAGE_URL:-}"
+
+#
+# Asserting Environment
+#
+
+declare -ra required_vars=(
+    PARAMS_IMAGE
+    PARAMS_CONTAINERFILE_PATH
+)
+
+exec buildah --storage-driver=${PARAMS_STORAGE_DRIVER} bud \
+        ${PARAMS_BUILD_EXTRA_ARGS}  \
+        --tls-verify=${PARAMS_TLS_VERIFY} --no-cache \
+        -f ${PARAMS_CONTAINERFILE_PATH} -t ${PARAMS_IMAGE} ${PARAMS_CONTEXT_SUBDIRECTORY}

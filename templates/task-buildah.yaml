@@ -74,6 +74,8 @@ spec:
       "params.BUILD_EXTRA_ARGS"
       "params.PUSH_EXTRA_ARGS"
       "params.SKIP_PUSH"
+      "workspaces.source.path"
+      "workspaces.source.bound"
       "results.IMAGE_DIGEST.path"
       "results.IMAGE_URL.path"
 }}

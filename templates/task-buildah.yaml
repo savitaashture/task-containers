@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/version: {{ .Chart.Version }}
 {{- if .Values.annotations }}
-  annotations: {}
+  annotations:
   {{- .Values.annotations | toYaml | nindent 4 }}
 {{- end }}
 spec:
@@ -82,7 +82,7 @@ spec:
   steps:
 {{- include "load_scripts" ( list . "buildah-" ) | nindent 4 }}
     - name: build
-      image: quay.io/buildah/stable:latest # {{ .Values.images.buildah }}
+      image: {{ .Values.images.buildah }}
       command:
         - /scripts/buildah-bud.sh
       volumeMounts:

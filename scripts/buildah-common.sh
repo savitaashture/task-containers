@@ -43,16 +43,4 @@ for v in "${required_vars[@]}"; do
         fail "'${v}' environment variable is not set!"
 done
 
-phase "Preparing the Workspaces, setting the expected ownership and permissions"
-chmod -v 775 "${WORKSPACES_SOURCE_PATH}"
-
-if [[ "${WORKSPACES_SOURCE_BOUND}" == "true" ]]; then
-    echo "WORKSPACE EXISTS"
-    # Testing only Define the Dockerfile contents
-    echo "FROM alpine:3.14" >> "/Dockerfile"
-    echo "CMD echo 'Hello world" >> "/Dockerfile"
-    cat $(/Dockerfile)
-else
-    fail "WORKSPACE_SOURCE is not bounded."
-fi
-
+phase "Declared successfully"

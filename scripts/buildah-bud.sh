@@ -3,8 +3,7 @@
 shopt -s inherit_errexit
 set -eu -o pipefail
 
-source "$(dirname ${BASH_SOURCE[0]})/common.sh"
-source "$(dirname ${BASH_SOURCE[0]})/buildah-common.sh"
+source "$(dirname ${BASH_SOURCE[0]})/buildah-prepare.sh"
 
 phase "Executing buildah bud script"
 

@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: populate-workspace-task
+spec:
+  workspaces:
+    - name: source
+  steps:
+    - name: populate-workspace-step
+      image: alpine
+      command:
+        - /bin/sh
+      args:
+        - -c
+        - |
+          echo "FROM alpine:3.14" >> /workspace/source/Dockerfile
+          echo "CMD echo 'Hello world'" >> /workspace/source/Dockerfile

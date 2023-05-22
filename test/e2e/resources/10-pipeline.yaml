@@ -1,0 +1,40 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  labels:
+    name: task-buildah
+  name: task-buildah
+spec:
+  params:
+    - name: IMAGE
+      type: string
+      description: Fully qualified image name, including tag
+    - name: CONTAINERFILE_PATH
+      type: string
+      description: path to the containerfile
+    # - name: VERBOSE
+    #   type: string
+    #   description: Verbose logging
+  workspaces:
+    - name: source
+
+  tasks:
+    - name: populate-workspace-task
+      taskRef:
+        name: populate-workspace-task
+      workspaces:
+        - name: source
+          workspace: source  
+    - name: buildah
+      taskRef:
+        name: buildah
+      runAfter:
+        - populate-workspace-task
+      workspaces:
+        - name: source
+          workspace: source
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+        - name: CONTAINERFILE_PATH
+          value: $(params.CONTAINERFILE_PATH)

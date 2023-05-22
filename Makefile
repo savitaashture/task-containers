@@ -18,6 +18,15 @@ E2E_SC_PARAMS_TLS_VERIFY ?= false
 # path to the github actions testing workflows
 ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
 
+# workspace "source" pvc resource and name
+E2E_BUILDAH_PVC ?= test/e2e/resources/01-pvc.yaml
+E2E_BUILDAH_PVC_NAME ?= task-buildah
+
+# buildah task e2e test variables, image path, containerfile_path
+E2E_BUILDAH_CONTAINERFILE_PATH ?= /workspace/source/Dockerfile
+E2E_BUILDAH_IMAGE ?= test-buildah
+E2E_BUILDAH_POPULATE_WORKSPACE ?= test/e2e/resources/populate-workspace-task.yaml
+
 # generic arguments employed on most of the targets
 ARGS ?=
 
@@ -39,6 +48,16 @@ default: helm-template
 # renders and installs the resources (task)
 install:
 	$(call render-template) |kubectl $(ARGS) apply -f -
+
+task-populate-workspace:
+	kubectl apply -f ${E2E_BUILDAH_POPULATE_WORKSPACE}
+
+# applies the pvc resource file, if the file exists
+.PHONY: workspace-source-pvc
+workspace-source-pvc:
+ifneq ("$(wildcard $(E2E_BUILDAH_PVC))","")
+	kubectl apply -f $(E2E_BUILDAH_PVC)
+endif
 
 # packages the helm-chart as a single tarball, using it's name and version to compose the file
 helm-package:

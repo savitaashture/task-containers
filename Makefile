@@ -72,7 +72,7 @@ clean:
 # run end-to-end tests against the current kuberentes context, it will required a cluster with tekton
 # pipelines and other requirements installed, before start testing the target invokes the
 # installation of the current project's task (using helm).
-test-e2e: install
+test-e2e: task-populate-workspace workspace-source-pvc install
 	$(BATS_CORE) $(BATS_FLAGS) $(ARGS) $(E2E_TESTS)
 
 # act runs the github actions workflows, so by default only running the test workflow (integration

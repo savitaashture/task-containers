@@ -7,7 +7,7 @@ readonly E2E_BUILDAH_CONTAINERFILE_PATH="${E2E_BUILDAH_CONTAINERFILE_PATH:-}"
 readonly E2E_BUILDAH_IMAGE="${E2E_BUILDAH_IMAGE:-}"
 
 # Testing the Buildah task,
-@test "[e2e] using the task build image from Dockerfile using buildah" {
+@test "[e2e] using the buildah task to build image from Dockerfile" {
     # asserting all required configuration is informed
     [ -n "${E2E_BUILDAH_PVC_NAME}" ]
     [ -n "${E2E_BUILDAH_CONTAINERFILE_PATH}" ]
@@ -34,7 +34,7 @@ readonly E2E_BUILDAH_IMAGE="${E2E_BUILDAH_IMAGE:-}"
 	assert_success
     
     # waiting a few seconds before asserting results
-	sleep 35
+	sleep 15
 
     #
 	# Asserting Status

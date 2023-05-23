@@ -55,6 +55,26 @@ EOS
 	run tkn pipelinerun describe --output=go-template-file --template=${tmpl_file}
 	assert_success
 	assert_output --partial '(Failed: 0, Cancelled 0), Skipped: 0'
+
+	# Asserting Results
+
+    cat >${tmpl_file} <<EOS
+{{- range .status.taskRuns -}}
+  {{- range .status.taskResults -}}
+    {{ printf "%s=%s\n" .name .value }}
+  {{- end -}}
+{{- end -}}
+EOS
+
+	# using a template to render the result attributes on a multi-line key-value pair output, the
+	# assertion is based on finding the expected results filled up
+	run tkn pipelinerun describe --output=go-template-file --template=${tmpl_file}
+	assert_success
+	assert_output --regexp $'^IMAGE_DIGEST=\S+\nIMAGE_URL=\S+.*'
+	
+	#assert_output --partial IMAGE_URL=${E2E_BUILDAH_IMAGE}
+	#assert_output --partial 'Successfully tagged'
+	
     
 }
 

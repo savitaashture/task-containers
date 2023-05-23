@@ -92,6 +92,13 @@ spec:
           mountPath: /scripts
       securityContext:
         privileged: true
+    - name: buildah-results
+      image: {{ .Values.images.buildah }}
+      command:
+        - /scripts/buildah-results.sh
+      volumeMounts:
+        - name: scripts-dir
+          mountPath: /scripts
     # - name: push
     #   workingDir: $(workspaces.source.path)
     #   image: registry.access.redhat.com/ubi8/buildah

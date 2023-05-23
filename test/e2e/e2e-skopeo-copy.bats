@@ -68,6 +68,5 @@ EOS
 
 # Cleaning up the resources
 teardown() {
-    kubectl delete -f templates/task-sc.yaml
     rm -f tmpl_file
 }

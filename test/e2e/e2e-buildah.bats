@@ -60,6 +60,5 @@ EOS
 
 # Cleaning up the resources
 teardown() {
-    kubectl delete -f templates/task-buildah.yaml
     rm -f tmpl_file
 }

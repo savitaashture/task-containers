@@ -28,5 +28,9 @@ phase "Extracting '${PARAMS_IMAGE}'  image digest"
 tmp=$(tail -n 2 $filename)
 
 printf "%s" ${PARAMS_IMAGE} >${RESULTS_IMAGE_URL_PATH}
-printf "%s" ${tmp} >${RESULTS_IMAGE_DIGEST_PATH}
+printf "%s" ${tmp} >${RESULTS_IMAGE_METADATA_PATH}
+
+if [[ "${PARAMS_SKIP_PUSH}" == "false" ]]; then
+    printf "%s" $(cat workspace/source/image_digest_push) >${RESULTS_IMAGE_DIGEST_PATH}
+fi
 

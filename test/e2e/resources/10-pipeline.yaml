@@ -9,6 +9,13 @@ spec:
     - name: IMAGE
       type: string
       description: Fully qualified image name, including tag
+    - name: REGISTRY
+      type: string
+      description: Full qualified registry url, including image name
+    - name: TLS_VERIFY
+      type: string
+      description: |
+        Sets the TLS verification flags
     - name: CONTAINERFILE_PATH
       type: string
       description: path to the containerfile
@@ -36,5 +43,9 @@ spec:
       params:
         - name: IMAGE
           value: $(params.IMAGE)
+        - name: REGISTRY
+          value: $(params.REGISTRY)
         - name: CONTAINERFILE_PATH
           value: $(params.CONTAINERFILE_PATH)
+        - name: TLS_VERIFY
+          value: $(params.TLS_VERIFY)

@@ -18,6 +18,10 @@ spec:
       type: string
       description: |
         Reference of the image buildah will produce.
+    - name: REGISTRY
+      type: string
+      description: |
+        Full qualified registry url, including image name
     - name: STORAGE_DRIVER
       type: string
       default: overlay
@@ -59,6 +63,9 @@ spec:
     - name: IMAGE_DIGEST
       description: |
         Digest of the image just built.
+    - name: IMAGE_METADATA
+      description: |
+        Contains Metadata of the digest
     - name: IMAGE_URL
       description: |
         Image repository where the built image would be pushed to
@@ -67,6 +74,7 @@ spec:
     env:
 {{- $variables := list
       "params.IMAGE"
+      "params.REGISTRY"
       "params.STORAGE_DRIVER"
       "params.TLS_VERIFY"
       "params.CONTAINERFILE_PATH"
@@ -77,6 +85,7 @@ spec:
       "workspaces.source.path"
       "workspaces.source.bound"
       "results.IMAGE_DIGEST.path"
+      "results.IMAGE_METADATA.path"
       "results.IMAGE_URL.path"
 }}
 {{- include "environment" ( list $variables ) | nindent 6 }}
@@ -86,7 +95,7 @@ spec:
     - name: build
       image: {{ .Values.images.buildah }}
       command:
-        - /scripts/buildah-bud.sh
+        - /scripts/buildah-bud-push.sh
       volumeMounts:
         - name: scripts-dir
           mountPath: /scripts

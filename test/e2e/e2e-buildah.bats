@@ -5,13 +5,16 @@ source ./test/helper/helper.sh
 readonly E2E_BUILDAH_PVC_NAME="${E2E_BUILDAH_PVC_NAME:-}"
 readonly E2E_BUILDAH_CONTAINERFILE_PATH="${E2E_BUILDAH_CONTAINERFILE_PATH:-}"
 readonly E2E_BUILDAH_IMAGE="${E2E_BUILDAH_IMAGE:-}"
+readonly E2E_BUILDAH_REGISTRY="${E2E_BUILDAH_REGISTRY:-}"
 
 # Testing the Buildah task,
-@test "[e2e] using the buildah task to build image from Dockerfile" {
+@test "[e2e] using the buildah task to build image from Dockerfile and pushing the image to registry" {
     # asserting all required configuration is informed
     [ -n "${E2E_BUILDAH_PVC_NAME}" ]
     [ -n "${E2E_BUILDAH_CONTAINERFILE_PATH}" ]
     [ -n "${E2E_BUILDAH_IMAGE}" ]
+	[ -n "${E2E_BUILDAH_REGISTRY}" ]
+	[ -n "${E2E_BUILDAH_TLS_VERIFY}" ] # Setting TLS_VERIFY=false
 
     # cleaning up all the existing resources before starting a new taskrun, the test assertion
 	# will describe the objects on the current namespace
@@ -27,6 +30,8 @@ readonly E2E_BUILDAH_IMAGE="${E2E_BUILDAH_IMAGE:-}"
 
     run tkn pipeline start task-buildah \
 		--param="IMAGE=${E2E_BUILDAH_IMAGE}" \
+		--param="REGISTRY=${E2E_BUILDAH_REGISTRY}" \
+		--param="TLS_VERIFY=${E2E_BUILDAH_TLS_VERIFY}" \
 		--param="CONTAINERFILE_PATH=${E2E_BUILDAH_CONTAINERFILE_PATH}" \
 		--workspace="name=source,claimName=${E2E_BUILDAH_PVC_NAME},subPath=source" \
         --filename=test/e2e/resources/10-pipeline.yaml \
@@ -70,11 +75,7 @@ EOS
 	# assertion is based on finding the expected results filled up
 	run tkn pipelinerun describe --output=go-template-file --template=${tmpl_file}
 	assert_success
-	assert_output --regexp $'^IMAGE_DIGEST=\S+\nIMAGE_URL=\S+.*'
-	
-	#assert_output --partial IMAGE_URL=${E2E_BUILDAH_IMAGE}
-	#assert_output --partial 'Successfully tagged'
-	
+	assert_output --regexp $'^IMAGE_DIGEST=\S+\nIMAGE_METADATA=\S+\nIMAGE_URL=\S+.*'	
     
 }
 

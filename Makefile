@@ -19,7 +19,7 @@ E2E_SC_PARAMS_TLS_VERIFY ?= false
 ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
 
 # workspace "source" pvc resource and name
-E2E_BUILDAH_PVC ?= test/e2e/resources/01-pvc.yaml
+E2E_BUILDAH_PVC ?= test/e2e/resources/pvc-buildah.yaml
 E2E_BUILDAH_PVC_NAME ?= task-buildah
 
 # buildah task e2e test variables, image path, containerfile_path

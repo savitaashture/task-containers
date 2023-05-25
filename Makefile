@@ -25,6 +25,8 @@ E2E_BUILDAH_PVC_NAME ?= task-buildah
 # buildah task e2e test variables, image path, containerfile_path
 E2E_BUILDAH_CONTAINERFILE_PATH ?= /workspace/source/Dockerfile
 E2E_BUILDAH_IMAGE ?= test-buildah
+E2E_BUILDAH_REGISTRY ?= docker://registry.registry.svc.cluster.local:32222/test-buildah:latest
+E2E_BUILDAH_TLS_VERIFY ?= false
 E2E_BUILDAH_POPULATE_WORKSPACE ?= test/e2e/resources/populate-workspace-task.yaml
 
 # generic arguments employed on most of the targets

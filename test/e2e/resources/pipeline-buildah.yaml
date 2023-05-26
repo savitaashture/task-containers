@@ -19,9 +19,10 @@ spec:
     - name: CONTAINERFILE_PATH
       type: string
       description: path to the containerfile
-    # - name: VERBOSE
-    #   type: string
-    #   description: Verbose logging
+    - name: VERBOSE
+      type: string
+      description: Verbose logging
+
   workspaces:
     - name: source
 
@@ -49,3 +50,5 @@ spec:
           value: $(params.CONTAINERFILE_PATH)
         - name: TLS_VERIFY
           value: $(params.TLS_VERIFY)
+        - name: VERBOSE
+          value: $(params.VERBOSE)

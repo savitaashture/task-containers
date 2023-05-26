@@ -33,6 +33,7 @@ readonly E2E_BUILDAH_REGISTRY="${E2E_BUILDAH_REGISTRY:-}"
 		--param="REGISTRY=${E2E_BUILDAH_REGISTRY}" \
 		--param="TLS_VERIFY=${E2E_BUILDAH_TLS_VERIFY}" \
 		--param="CONTAINERFILE_PATH=${E2E_BUILDAH_CONTAINERFILE_PATH}" \
+		--param="VERBOSE=true" \
 		--workspace="name=source,claimName=${E2E_BUILDAH_PVC_NAME},subPath=source" \
         --filename=test/e2e/resources/pipeline-buildah.yaml \
 		--showlog >&3

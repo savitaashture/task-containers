@@ -6,13 +6,8 @@ set -eu -o pipefail
 source "$(dirname ${BASH_SOURCE[0]})/common.sh"
 source "$(dirname ${BASH_SOURCE[0]})/buildah-common.sh"
 
-# function buildah_inspect() {
-#     buildah inspect --format='{{ .FromImageDigest }}' \
-#         ${1}
-# }
-
 # file storing image digest and tag
-filename="workspace/source/image_digest"
+filename="workspace/source/image_bud_metadata"
 
 if [ -e "$filename" ]; then
   echo "File exists: $filename"
@@ -21,7 +16,7 @@ else
   exit 1
 fi
 
-phase "Extracting '${PARAMS_IMAGE}'  image digest"
+phase "Extracting '${PARAMS_IMAGE}'  image metadata"
 ## Verify if the image is successfully built
 
 # Getting last 2 lines from filename
@@ -30,7 +25,7 @@ tmp=$(tail -n 2 $filename)
 printf "%s" ${PARAMS_IMAGE} >${RESULTS_IMAGE_URL_PATH}
 printf "%s" ${tmp} >${RESULTS_IMAGE_METADATA_PATH}
 
-if [[ "${PARAMS_SKIP_PUSH}" == "false" ]]; then
+if [[ "${PARAMS_SKIP_PUSH}" == "false" ]] &&  [ -e "workspace/source/image_digest" ] ; then
     printf "%s" $(cat workspace/source/image_digest_push) >${RESULTS_IMAGE_DIGEST_PATH}
 fi
 

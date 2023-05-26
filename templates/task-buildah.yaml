@@ -56,6 +56,12 @@ spec:
       default: "false"
       description: |
         Skip pushing the built image
+    - name: VERBOSE
+      type: string
+      default: "false"
+      description:
+        Turns on verbose logging, all commands executed will be printed out.
+
   workspaces:
     - name: source
 
@@ -82,6 +88,7 @@ spec:
       "params.BUILD_EXTRA_ARGS"
       "params.PUSH_EXTRA_ARGS"
       "params.SKIP_PUSH"
+      "params.VERBOSE"
       "workspaces.source.path"
       "workspaces.source.bound"
       "results.IMAGE_DIGEST.path"
@@ -108,14 +115,7 @@ spec:
       volumeMounts:
         - name: scripts-dir
           mountPath: /scripts
-    # - name: push
-    #   workingDir: $(workspaces.source.path)
-    #   image: registry.access.redhat.com/ubi8/buildah
-    #   command:
-    #     - buildah
-    #     - push
-    #     - $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-    
+
   volumes:
   - name: scripts-dir
     emptyDir: {}

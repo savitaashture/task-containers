@@ -7,7 +7,9 @@ source "$(dirname ${BASH_SOURCE[0]})/buildah-prepare.sh"
 
 phase "Executing buildah bud script"
 
-set -x
+if [[ "${PARAMS_VERBOSE}" == "true" ]]; then
+    set -x
+fi
 
 buildah --storage-driver=${PARAMS_STORAGE_DRIVER} bud \
         ${PARAMS_BUILD_EXTRA_ARGS}  \
@@ -15,7 +17,7 @@ buildah --storage-driver=${PARAMS_STORAGE_DRIVER} bud \
         -f ${PARAMS_CONTAINERFILE_PATH} \
         -t ${PARAMS_IMAGE} \
         ${PARAMS_CONTEXT_SUBDIRECTORY} \
-        > workspace/source/image_digest
+        > workspace/source/image_bud_metadata
 
 if [[ "${PARAMS_SKIP_PUSH}" == "true" ]]; then
     echo "Push skipped"

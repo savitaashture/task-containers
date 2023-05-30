@@ -64,6 +64,9 @@ spec:
 
   workspaces:
     - name: source
+      optional: true
+      description: |
+        Application source-code. Will contain the Container File.
 
   results:
     - name: IMAGE_DIGEST

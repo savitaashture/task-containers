@@ -55,8 +55,8 @@ task-populate-workspace:
 	kubectl apply -f ${E2E_BUILDAH_POPULATE_WORKSPACE}
 
 # applies the pvc resource file, if the file exists
-.PHONY: workspace-source-pvc
-workspace-source-pvc:
+.PHONY: workspace-source-pvc-buildah
+workspace-source-pvc-buildah:
 ifneq ("$(wildcard $(E2E_BUILDAH_PVC))","")
 	kubectl apply -f $(E2E_BUILDAH_PVC)
 endif
@@ -74,7 +74,7 @@ clean:
 # run end-to-end tests against the current kuberentes context, it will required a cluster with tekton
 # pipelines and other requirements installed, before start testing the target invokes the
 # installation of the current project's task (using helm).
-test-e2e: task-populate-workspace workspace-source-pvc install
+test-e2e: task-populate-workspace workspace-source-pvc-buildah install
 	$(BATS_CORE) $(BATS_FLAGS) $(ARGS) $(E2E_TESTS)
 
 # act runs the github actions workflows, so by default only running the test workflow (integration

@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -8,46 +9,33 @@ spec:
   params:
     - name: IMAGE
       type: string
-      description: Fully qualified image name, including tag
-    - name: REGISTRY
-      type: string
-      description: Full qualified registry url, including image name
     - name: TLS_VERIFY
       type: string
-      description: |
-        Sets the TLS verification flags
-    - name: CONTAINERFILE_PATH
-      type: string
-      description: path to the containerfile
     - name: VERBOSE
       type: string
-      description: Verbose logging
 
   workspaces:
     - name: source
 
   tasks:
-    - name: populate-workspace-task
+    - name: containerfile-stub
       taskRef:
-        name: populate-workspace-task
+        name: containerfile-stub
       workspaces:
         - name: source
-          workspace: source  
+          workspace: source
+
     - name: buildah
       taskRef:
         name: buildah
       runAfter:
-        - populate-workspace-task
+        - containerfile-stub
       workspaces:
         - name: source
           workspace: source
       params:
         - name: IMAGE
           value: $(params.IMAGE)
-        - name: REGISTRY
-          value: $(params.REGISTRY)
-        - name: CONTAINERFILE_PATH
-          value: $(params.CONTAINERFILE_PATH)
         - name: TLS_VERIFY
           value: $(params.TLS_VERIFY)
         - name: VERBOSE

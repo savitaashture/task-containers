@@ -4,14 +4,13 @@ source ./test/helper/helper.sh
 
 declare -rx E2E_SC_PARAMS_SOURCE="${E2E_SC_PARAMS_SOURCE:-}"
 declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
-declare -rx E2E_SC_PARAMS_TLS_VERIFY="${E2E_SC_PARAMS_TLS_VERIFY:-}"
 
 # Testing the skopeo-copy task,
-@test "[e2e] using the task to copy an image from remote public registry to local registry" {
+@test "[e2e] skopeo-copy task copying a image from source to destination registry" {
     # asserting all required configuration is informed
 	[ -n "${E2E_SC_PARAMS_SOURCE}" ]
     [ -n "${E2E_SC_PARAMS_DESTINATION}" ]
-    [ -n "${E2E_SC_PARAMS_TLS_VERIFY}" ]
+    [ -n "${E2E_PARAMS_TLS_VERIFY}" ]
 
     # cleaning up all the existing resources before starting a new taskrun, the test assertion
 	# will describe the objects on the current namespace
@@ -21,52 +20,20 @@ declare -rx E2E_SC_PARAMS_TLS_VERIFY="${E2E_SC_PARAMS_TLS_VERIFY:-}"
     #
     # E2E TaskRun
     #
-    
+
     run tkn task start skopeo-copy \
         --param="SOURCE=${E2E_SC_PARAMS_SOURCE}" \
         --param="DESTINATION=${E2E_SC_PARAMS_DESTINATION}" \
-        --param="TLS_VERIFY=${E2E_SC_PARAMS_TLS_VERIFY}" \
+        --param="TLS_VERIFY=${E2E_PARAMS_TLS_VERIFY}" \
         --param="VERBOSE=true" \
         --showlog
     assert_success
 
     # waiting a few seconds before asserting results
-	sleep 25
+	sleep 30
 
-    #
-    # Asserting TaskRun Status
-    #
-
-    readonly tmpl_file="${BASE_DIR}/go-template.tpl"
-
-    cat >${tmpl_file} <<EOS
-{{- range .status.conditions -}}
-	{{- if and (eq .type "Succeeded") (eq .status "True") }}
-		{{ .message }}
-	{{- end }}
-{{- end -}}
-EOS
-
-	# using template to select the requered information and asserting all tasks have been executed
-	# without failed or skipped steps
-	run tkn taskrun describe --output=go-template-file --template=${tmpl_file}
-	assert_success
-	assert_success --partial 'All Steps have completed executing'
-
-
-    # Asserting Results
-
-    cat >${tmpl_file} <<EOS
-{{- range .status.taskResults -}}
-    {{ printf "%s=%s\n" .name .value }}
-{{- end -}}
-EOS
-	run tkn taskrun describe --output=go-template-file --template=${tmpl_file}
-	assert_success
-	assert_output --regexp $'^DESTINATION_DIGEST=\S+\nSOURCE_DIGEST=\S+.*'
-}
-
-# Cleaning up the resources
-teardown() {
-    rm -f tmpl_file
+    # assering the taskrun status, making sure all steps have been successful
+    assert_tekton_resource "taskrun" --partial 'All Steps have completed executing'
+    # asserting the latest taskrun instacne to inspect the resources against a regular expression
+    assert_tekton_resource "taskrun" --regexp $'DESTINATION_DIGEST=\S+\nSOURCE_DIGEST=\S+.*'
 }

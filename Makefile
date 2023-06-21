@@ -9,25 +9,37 @@ BATS_FLAGS ?= --print-output-on-failure --show-output-of-passing-tests --verbose
 # path to the bats test files, overwite the variables below to tweak the test scope
 E2E_TESTS ?= ./test/e2e/*.bats
 
-# skopeo-copy task e2e test variables, source, destination url and tls-verify parameter.
-E2E_SC_PARAMS_SOURCE ?= docker://docker.io/library/busybox:latest
-E2E_SC_PARAMS_DESTINATION ?= docker://registry.registry.svc.cluster.local:32222/busybox:latest
-# setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
-E2E_SC_PARAMS_TLS_VERIFY ?= false
+# container registry URL, usually hostname and port
+REGISTRY_URL ?= registry.registry.svc.cluster.local:32222
+# containre registry namespace, as in the section of the registry allowed to push images
+REGISTRY_NAMESPACE ?= task-containers
+# base part of a fully qualified container image name
+IMAGE_BASE ?= $(REGISTRY_URL)/$(REGISTRY_NAMESPACE)
 
-# path to the github actions testing workflows
-ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
+# end-to-end test source image to be copied by skopeo
+E2E_SC_PARAMS_SOURCE ?= docker://docker.io/library/busybox:latest
+# end-to-end test destination image name and tag
+E2E_SC_IMAGE_TAG ?= busybox:latest
+# end-to-end test fully qualified destination image name
+E2E_SC_PARAMS_DESTINATION ?= docker://$(IMAGE_BASE)/${E2E_SC_IMAGE_TAG}
+
+# setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
+# using the internal container registry (HTTP based)
+E2E_PARAMS_TLS_VERIFY ?= false
 
 # workspace "source" pvc resource and name
 E2E_BUILDAH_PVC ?= test/e2e/resources/pvc-buildah.yaml
 E2E_BUILDAH_PVC_NAME ?= task-buildah
+# auxilitary task to create a Containerfile for buildah end-to-end testing
+E2E_BUILDAH_TASK_CONTAINERFILE_STUB ?= test/e2e/resources/task-containerfile-stub.yaml
 
-# buildah task e2e test variables, image path, containerfile_path
-E2E_BUILDAH_CONTAINERFILE_PATH ?= /workspace/source/Dockerfile
-E2E_BUILDAH_IMAGE ?= test-buildah
-E2E_BUILDAH_REGISTRY ?= docker://registry.registry.svc.cluster.local:32222/test-buildah:latest
-E2E_BUILDAH_TLS_VERIFY ?= false
-E2E_BUILDAH_POPULATE_WORKSPACE ?= test/e2e/resources/populate-workspace-task.yaml
+# container image name and tag to be created by buildah during e2e
+E2E_BUILDAH_IMAGE_TAG ?= task-buildah:latest
+# fully qualified container image passed to buidah task IMAGE param
+E2E_BUILDAH_PARAMS_IMAGE ?= $(IMAGE_BASE)/${E2E_BUILDAH_IMAGE_TAG}
+
+# path to the github actions testing workflows
+ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
 
 # generic arguments employed on most of the targets
 ARGS ?=
@@ -51,8 +63,9 @@ default: helm-template
 install:
 	$(call render-template) |kubectl $(ARGS) apply -f -
 
-task-populate-workspace:
-	kubectl apply -f ${E2E_BUILDAH_POPULATE_WORKSPACE}
+# applies the resource file
+task-containerfile-stub:
+	kubectl apply -f ${E2E_BUILDAH_TASK_CONTAINERFILE_STUB}
 
 # applies the pvc resource file, if the file exists
 .PHONY: workspace-source-pvc-buildah
@@ -73,8 +86,8 @@ clean:
 
 # run end-to-end tests against the current kuberentes context, it will required a cluster with tekton
 # pipelines and other requirements installed, before start testing the target invokes the
-# installation of the current project's task (using helm).
-test-e2e: task-populate-workspace workspace-source-pvc-buildah install
+# installation of the current project's task (using helm)
+test-e2e: task-containerfile-stub workspace-source-pvc-buildah install
 	$(BATS_CORE) $(BATS_FLAGS) $(ARGS) $(E2E_TESTS)
 
 # act runs the github actions workflows, so by default only running the test workflow (integration

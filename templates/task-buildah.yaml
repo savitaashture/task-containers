@@ -13,35 +13,36 @@ spec:
   description: |
     Buildah task builds source into a container image and
     then pushes it to a container registry.
+
+  workspaces:
+    - name: source
+      optional: false
+      description: |
+        Container build context, like for instnace a application source code
+        followed by a `Containerfile`.
+
   params:
     - name: IMAGE
       type: string
       description: |
-        Reference of the image buildah will produce.
-    - name: REGISTRY
+        Fully qualified container image name to be built by buildah.
+    - name: SUBDIRECTORY
       type: string
+      default: "."
       description: |
-        Full qualified registry url, including image name
-    - name: STORAGE_DRIVER
-      type: string
-      default: overlay
-      description: |
-        Set buildah storage driver
+        Relative subdirectory to the `source` Workspace used as buildah's
+        context.
     - name: CONTAINERFILE_PATH
       type: string
       default: ./Containerfile
       description: |
-        Path to the `Containerfile` (`Dockerfile`) to build.
-    - name: CONTEXT_SUBDIRECTORY
+        Path to the `Containerfile` (or `Dockerfile`).
+    - name: STORAGE_DRIVER
       type: string
-      default: .
+      default: overlay
       description: |
-        Relative subdirectory to the `source` Workspace used as "context".
-    - name: TLS_VERIFY
-      type: string
-      default: "true"
-      description: |
-        Sets the TLS verification flags, `true` is recommended.
+        Set buildah storage driver to reflect the currrent cluster node's
+        settings.
     - name: BUILD_EXTRA_ARGS
       type: string
       default: ""
@@ -55,71 +56,59 @@ spec:
     - name: SKIP_PUSH
       default: "false"
       description: |
-        Skip pushing the built image
+        Skip pushing the image to the container registry.
+    - name: TLS_VERIFY
+      type: string
+      default: "true"
+      description: |
+        Sets the TLS verification flag, `true` is recommended.
     - name: VERBOSE
       type: string
       default: "false"
       description:
         Turns on verbose logging, all commands executed will be printed out.
 
-  workspaces:
-    - name: source
-      optional: true
-      description: |
-        Application source-code. Will contain the Container File.
-
   results:
-    - name: IMAGE_DIGEST
-      description: |
-        Digest of the image just built.
-    - name: IMAGE_METADATA
-      description: |
-        Contains Metadata of the digest
     - name: IMAGE_URL
       description: |
         Image repository where the built image would be pushed to
-  
+    - name: IMAGE_DIGEST
+      description: |
+        Digest of the image just built.
+
   stepTemplate:
     env:
 {{- $variables := list
       "params.IMAGE"
-      "params.REGISTRY"
-      "params.STORAGE_DRIVER"
-      "params.TLS_VERIFY"
+      "params.SUBDIRECTORY"
       "params.CONTAINERFILE_PATH"
-      "params.CONTEXT_SUBDIRECTORY"
+      "params.STORAGE_DRIVER"
       "params.BUILD_EXTRA_ARGS"
       "params.PUSH_EXTRA_ARGS"
       "params.SKIP_PUSH"
+      "params.TLS_VERIFY"
       "params.VERBOSE"
-      "workspaces.source.path"
       "workspaces.source.bound"
-      "results.IMAGE_DIGEST.path"
-      "results.IMAGE_METADATA.path"
+      "workspaces.source.path"
       "results.IMAGE_URL.path"
+      "results.IMAGE_DIGEST.path"
 }}
 {{- include "environment" ( list $variables ) | nindent 6 }}
 
   steps:
 {{- include "load_scripts" ( list . "buildah-" ) | nindent 4 }}
+
     - name: build
       image: {{ .Values.images.buildah }}
+      workingDir: /workspace/source
       command:
-        - /scripts/buildah-bud-push.sh
-      volumeMounts:
-        - name: scripts-dir
-          mountPath: /scripts
+        - /scripts/buildah-bud.sh
       securityContext:
         privileged: true
-    - name: buildah-results
-      image: {{ .Values.images.buildah }}
-      command:
-        - /scripts/buildah-results.sh
       volumeMounts:
         - name: scripts-dir
           mountPath: /scripts
 
   volumes:
-  - name: scripts-dir
-    emptyDir: {}
-      
+    - name: scripts-dir
+      emptyDir: {}

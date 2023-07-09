@@ -17,25 +17,24 @@ declare -rx RESULTS_IMAGE_DIGEST_PATH="${RESULTS_IMAGE_DIGEST_PATH:-}"
 declare -rx RESULTS_IMAGE_URL_PATH="${RESULTS_IMAGE_URL_PATH:-}"
 
 #
-# Additional Configuration
+# Containerfile
 #
 
-declare -rx TEKTON_HOME="${TEKTON_HOME:-/tekton/home}"
+# exposing the full path to the container file, which by default should be relative to the primary
+# workspace, to receive a different container-file location
+declare -r containerfile_path_on_ws="${WORKSPACES_SOURCE_PATH}/${PARAMS_CONTAINERFILE_PATH}"
+declare -x CONTAINERFILE_PATH_FULL="${CONTAINERFILE_PATH_FULL:-${containerfile_path_on_ws}}"
 
 #
 # Asserting Environment
 #
 
-declare -ra required_vars=(
-    WORKSPACES_SOURCE_PATH
-    PARAMS_IMAGE
-    PARAMS_CONTAINERFILE_PATH
-)
+[[ -z "${CONTAINERFILE_PATH_FULL}" ]] &&
+    fail "unable to find the Containerfile, CONTAINERFILE_PATH may have an incorrect location"
 
-for v in "${required_vars[@]}"; do
-    [[ -z "${!v}" ]] &&
-        fail "'${v}' environment variable is not set!"
-done
+exported_or_fail \
+    WORKSPACES_SOURCE_PATH \
+    PARAMS_IMAGE
 
 #
 # Verbose Output

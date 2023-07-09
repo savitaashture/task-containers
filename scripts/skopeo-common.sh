@@ -12,17 +12,11 @@ declare -rx RESULTS_DESTINATION_DIGEST_PATH="${RESULTS_DESTINATION_DIGEST_PATH:-
 # Asserting Environment
 #
 
-declare -ra required_vars=(
-    PARAMS_SOURCE
-    PARAMS_DESTINATION
-    RESULTS_SOURCE_DIGEST_PATH
+exported_or_fail \
+    PARAMS_SOURCE \
+    PARAMS_DESTINATION \
+    RESULTS_SOURCE_DIGEST_PATH \
     RESULTS_DESTINATION_DIGEST_PATH
-)
-
-for v in "${required_vars[@]}"; do
-    [[ -z "${!v}" ]] &&
-        fail "'${v}' environment variable is not set!"
-done
 
 #
 # Skopeo Authentication

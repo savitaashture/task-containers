@@ -26,55 +26,17 @@ spec:
       type: string
       description: |
         Fully qualified container image name to be built by buildah.
-    - name: SUBDIRECTORY
-      type: string
-      default: "."
-      description: |
-        Relative subdirectory to the `source` Workspace used as buildah's
-        context.
     - name: CONTAINERFILE_PATH
       type: string
-      default: ./Containerfile
+      default: Containerfile
       description: |
-        Path to the `Containerfile` (or `Dockerfile`).
-    - name: STORAGE_DRIVER
-      type: string
-      default: overlay
-      description: |
-        Set buildah storage driver to reflect the currrent cluster node's
-        settings.
-    - name: BUILD_EXTRA_ARGS
-      type: string
-      default: ""
-      description: |
-        Extra parameters passed for the build command when building images.
-    - name: PUSH_EXTRA_ARGS
-      type: string
-      default: ""
-      description: |
-        Extra parameters passed for the push command when pushing images.
-    - name: SKIP_PUSH
-      default: "false"
-      description: |
-        Skip pushing the image to the container registry.
-    - name: TLS_VERIFY
-      type: string
-      default: "true"
-      description: |
-        Sets the TLS verification flag, `true` is recommended.
-    - name: VERBOSE
-      type: string
-      default: "false"
-      description:
-        Turns on verbose logging, all commands executed will be printed out.
+        Path to the `Containerfile` (or `Dockerfile`) relative to the `source` workspace.
+
+{{- include "params_buildah_common" . | nindent 4 }}
+{{- include "params_common" . | nindent 4 }}
 
   results:
-    - name: IMAGE_URL
-      description: |
-        Image repository where the built image would be pushed to
-    - name: IMAGE_DIGEST
-      description: |
-        Digest of the image just built.
+{{- include "results_buildah" . | nindent 4 }}
 
   stepTemplate:
     env:

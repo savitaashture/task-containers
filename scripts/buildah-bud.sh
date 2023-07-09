@@ -26,23 +26,26 @@ phase "Inspecting source workspace '${WORKSPACES_SOURCE_PATH}' (PWD='${PWD}')"
 [[ "${WORKSPACES_SOURCE_BOUND}" != "true" ]] &&
     fail "Workspace 'source' is not bounded"
 
-# before starting, checking if the Containerfile exists
-phase "Checking '${PARAMS_CONTAINERFILE_PATH}' on '${PARAMS_SUBDIRECTORY}' context directory"
-[[ ! -f "${PARAMS_CONTAINERFILE_PATH}" ]] &&
-    fail "Containerfile not found at: '${WORKSPACES_SOURCE_PATH}/${PARAMS_CONTAINERFILE_PATH}'"
+phase "Asserting the container-file '${CONTAINERFILE_PATH_FULL}' exists"
+[[ ! -f "${CONTAINERFILE_PATH_FULL}" ]] &&
+    fail "Containerfile not found at: '${CONTAINERFILE_PATH_FULL}'"
+
+phase "Inspecting context subdirectory '${PARAMS_SUBDIRECTORY}'"
+[[ ! -d "${PARAMS_SUBDIRECTORY}" ]] &&
+    fail "SUBDIRECTORY param is not found at '${PARAMS_SUBDIRECTORY}', on source workspace"
 
 #
 # Build
 #
 
-phase "Building '${PARAMS_IMAGE}' based on '${PARAMS_CONTAINERFILE_PATH}'"
+phase "Building '${PARAMS_IMAGE}' based on '${CONTAINERFILE_PATH_FULL}'"
 
 [[ -n "${PARAMS_BUILD_EXTRA_ARGS}" ]] &&
     phase "Extra 'buildah bud' arguments informed: '${PARAMS_BUILD_EXTRA_ARGS}'"
 
 _buildah bud ${PARAMS_BUILD_EXTRA_ARGS} \
     --no-cache \
-    --file="${PARAMS_CONTAINERFILE_PATH}" \
+    --file="${CONTAINERFILE_PATH_FULL}" \
     --tag="${PARAMS_IMAGE}" \
     ${PARAMS_SUBDIRECTORY}
 

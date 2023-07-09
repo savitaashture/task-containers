@@ -5,22 +5,24 @@
 */ -}}
 
 {{- define "load_scripts" -}}
-  {{- $prefix := index . 1 -}}
-  {{- with index . 0 -}}
+  {{- $global := index . 0 -}}
 - name: load-scripts
-  image: {{ .Values.images.bash }}
+  image: {{ $global.Values.images.bash }}
   workingDir: /scripts
   script: |
     set -e
-  {{- range $path, $content := .Files.Glob "scripts/*.sh" }}
-    {{- $name := trimPrefix "scripts/" $path }}
-    {{- if or ( hasPrefix $prefix $name ) ( hasPrefix "common" $name ) }}
+  {{- range $i, $prefix := . -}}
+    {{- if gt $i 0 }}
+      {{- range $path, $content := $global.Files.Glob "scripts/*.sh" }}
+        {{- $name := trimPrefix "scripts/" $path }}
+        {{- if or ( hasPrefix $prefix $name ) ( hasPrefix "common" $name ) }}
     printf '%s' "{{ $content | toString | b64enc }}" |base64 -d >{{ $name }}
+        {{- end }}
+      {{- end }}
+    chmod +x {{ $prefix }}*.sh
     {{- end }}
   {{- end }}
-    chmod +x /scripts/*.sh
   volumeMounts:
     - name: scripts-dir
       mountPath: /scripts
-  {{- end -}}
 {{- end -}}

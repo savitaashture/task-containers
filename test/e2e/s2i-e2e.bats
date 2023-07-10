@@ -9,7 +9,6 @@ declare -rx E2E_S2I_PVC_SUBPATH="${E2E_S2I_PVC_SUBPATH:-}"
 declare -rx E2E_S2I_PARAMS_URL="${E2E_S2I_PARAMS_URL:-}"
 declare -rx E2E_S2I_PARAMS_REVISION="${E2E_S2I_PARAMS_REVISON:-}"
 declare -rx E2E_S2I_PARAMS_IMAGE="${E2E_S2I_PARAMS_IMAGE:-}"
-declare -rx E2E_S2I_PARAMS_BUILDER_IMAGE="${E2E_S2I_PARAMS_BUILDER_IMAGE:-}"
 
 @test "[e2e] pipeline-run using s2i task" {
     [ -n "${E2E_S2I_PVC_NAME}" ]
@@ -17,7 +16,6 @@ declare -rx E2E_S2I_PARAMS_BUILDER_IMAGE="${E2E_S2I_PARAMS_BUILDER_IMAGE:-}"
     [ -n "${E2E_S2I_PARAMS_URL}" ]
     [ -n "${E2E_S2I_PARAMS_REVISION}" ]
     [ -n "${E2E_S2I_PARAMS_IMAGE}" ]
-    [ -n "${E2E_S2I_PARAMS_BUILDER_IMAGE}" ]
     [ -n "${E2E_PARAMS_TLS_VERIFY}" ]
 
     # cleaning up existing resources before starting a new pipelinerun
@@ -28,7 +26,6 @@ declare -rx E2E_S2I_PARAMS_BUILDER_IMAGE="${E2E_S2I_PARAMS_BUILDER_IMAGE:-}"
         --param="URL=${E2E_S2I_PARAMS_URL}" \
         --param="REVISION=${E2E_S2I_PARAMS_REVISION}" \
         --param="IMAGE=${E2E_S2I_PARAMS_IMAGE}" \
-        --param="BUILDER_IMAGE=${E2E_S2I_PARAMS_BUILDER_IMAGE}" \
         --param="TLS_VERIFY=${E2E_PARAMS_TLS_VERIFY}" \
         --param="VERBOSE=true" \
         --workspace="name=source,claimName=${E2E_S2I_PVC_NAME},subPath=${E2E_S2I_PVC_SUBPATH}" \

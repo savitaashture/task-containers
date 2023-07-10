@@ -10,6 +10,9 @@ set -eu -o pipefail
 source "$(dirname ${BASH_SOURCE[0]})/common.sh"
 source "$(dirname ${BASH_SOURCE[0]})/s2i-common.sh"
 
+# s2i builder image name (fully qualified)
+declare -rx S2I_BUILDER_IMAGE="${S2I_BUILDER_IMAGE:-}"
+
 # re-using the same parameters than buildah, s2i needs buildah abilities to create the final
 # container image based on what s2i generates
 source "$(dirname ${BASH_SOURCE[0]})/buildah-common.sh"
@@ -32,9 +35,9 @@ phase "Inspecting context subdirectory '${PARAMS_SUBDIRECTORY}'"
 # S2I Generate
 #
 
-phase "Generating the Containerfile for S2I builder image '${PARAMS_BUILDER_IMAGE}'"
+phase "Generating the Containerfile for S2I builder image '${S2I_BUILDER_IMAGE}'"
 s2i --loglevel "${S2I_LOGLEVEL}" \
-    build "${PARAMS_SUBDIRECTORY}" "${PARAMS_BUILDER_IMAGE}" \
+    build "${PARAMS_SUBDIRECTORY}" "${S2I_BUILDER_IMAGE}" \
         --as-dockerfile "${S2I_CONTAINERFILE_PATH}"
 
 phase "Inspecting the Containerfile generated at '${S2I_CONTAINERFILE_PATH}'"

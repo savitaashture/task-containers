@@ -3,8 +3,8 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   labels:
-    name: task-s2i
-  name: task-s2i
+    name: task-s2i-go
+  name: task-s2i-go
 spec:
   workspaces:
     - name: source
@@ -16,8 +16,6 @@ spec:
     - name: REVISION
       type: string
     - name: IMAGE
-      type: string
-    - name: BUILDER_IMAGE
       type: string
     - name: TLS_VERIFY
       type: string
@@ -41,9 +39,9 @@ spec:
         - name: VERBOSE
           value: "$(params.VERBOSE)"
 
-    - name: s2i
+    - name: s2i-go
       taskRef:
-        name: s2i
+        name: s2i-go
       runAfter:
         - git
       workspaces:
@@ -52,8 +50,6 @@ spec:
       params:
         - name: IMAGE
           value: "$(params.IMAGE)"
-        - name: BUILDER_IMAGE
-          value: "$(params.BUILDER_IMAGE)"
         - name: TLS_VERIFY
           value: "$(params.TLS_VERIFY)"
         - name: VERBOSE

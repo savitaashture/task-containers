@@ -12,6 +12,6 @@
 - name: VERBOSE
   type: string
   default: "false"
-  description:
+  description: |
     Turns on verbose logging, all commands executed will be printed out.
 {{- end -}}

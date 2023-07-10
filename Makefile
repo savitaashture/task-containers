@@ -53,10 +53,6 @@ E2E_S2I_IMAGE_TAG ?= task-s2i:latest
 # (fully qualified) container image passed to s2i task IMAGE param
 E2E_S2I_PARAMS_IMAGE ?= $(IMAGE_BASE)/${E2E_S2I_IMAGE_TAG}
 
-# fully qualified container image passed to s2i task IMAGE_BULDER param, for instance Python's
-# builder image "quay.io/repository/fedora/python-311:latest"
-E2E_S2I_PARAMS_BUILDER_IMAGE ?= docker.io/centos/go-toolset-7-centos7:latest
-
 # s2i end-to-end test pipeline params, the git repository URL and revision
 E2E_S2I_PARAMS_URL ?= https://github.com/cpuguy83/go-md2man.git
 E2E_S2I_PARAMS_REVISION ?= master

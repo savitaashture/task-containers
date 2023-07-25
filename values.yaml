@@ -11,6 +11,7 @@ images:
 s2iBuilders:
   go: docker.io/centos/go-toolset-7-centos7:latest
   python: quay.io/sclorg/python-39-c9s:latest
+  nodejs: registry.access.redhat.com/ubi8/nodejs-18:latest
 
 annotations:
   tekton.dev/pipelines.minVersion: "0.38.0"

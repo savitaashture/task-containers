@@ -57,6 +57,9 @@ E2E_S2I_PARAMS_IMAGE ?= $(IMAGE_BASE)/${E2E_S2I_IMAGE_TAG}
 E2E_S2I_PARAMS_URL ?= https://github.com/cpuguy83/go-md2man.git
 E2E_S2I_PARAMS_REVISION ?= master
 
+# s2i end-to-end test language of choice for using correct builder image
+E2E_S2I_LANGUAGE ?= python
+
 # path to the github actions testing workflows
 ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
 

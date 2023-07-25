@@ -9,6 +9,7 @@ declare -rx E2E_S2I_PVC_SUBPATH="${E2E_S2I_PVC_SUBPATH:-}"
 declare -rx E2E_S2I_PARAMS_URL="${E2E_S2I_PARAMS_URL:-}"
 declare -rx E2E_S2I_PARAMS_REVISION="${E2E_S2I_PARAMS_REVISON:-}"
 declare -rx E2E_S2I_PARAMS_IMAGE="${E2E_S2I_PARAMS_IMAGE:-}"
+declare -rx E2E_S2I_LANGUAGE="${E2E_S2I_LANGUAGE:-}"
 
 @test "[e2e] pipeline-run using s2i task" {
     [ -n "${E2E_S2I_PVC_NAME}" ]
@@ -29,7 +30,7 @@ declare -rx E2E_S2I_PARAMS_IMAGE="${E2E_S2I_PARAMS_IMAGE:-}"
         --param="TLS_VERIFY=${E2E_PARAMS_TLS_VERIFY}" \
         --param="VERBOSE=true" \
         --workspace="name=source,claimName=${E2E_S2I_PVC_NAME},subPath=${E2E_S2I_PVC_SUBPATH}" \
-        --filename=test/e2e/resources/pipeline-s2i.yaml \
+        --filename=test/e2e/resources/pipeline-s2i-${E2E_S2I_LANGUAGE}.yaml \
         --showlog >&3
     assert_success
 

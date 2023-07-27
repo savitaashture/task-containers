@@ -1,10 +1,9 @@
----
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
+  name: task-s2i
   labels:
-    name: task-s2i-ruby
-  name: task-s2i-ruby
+    name: task-s2i
 spec:
   workspaces:
     - name: source
@@ -38,10 +37,9 @@ spec:
           value: "false"
         - name: VERBOSE
           value: "$(params.VERBOSE)"
-
-    - name: s2i-ruby
+    - name: s2i
       taskRef:
-        name: s2i-ruby
+        name: s2i
       runAfter:
         - git
       workspaces:

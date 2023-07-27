@@ -1,0 +1,8 @@
+resources:
+  - ../../base
+
+patches:
+  - path: ./s2i-go.yaml
+    target:
+      kind: Pipeline
+      name: task-s2i

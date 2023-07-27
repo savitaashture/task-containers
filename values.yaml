@@ -9,10 +9,10 @@ images:
 # source-to-image builder images, each language represents a distinct ecosystem the builder supports,
 # sometimes it includes a specific version
 s2iBuilders:
-  go: docker.io/centos/go-toolset-7-centos7:latest
-  python: registry.access.redhat.com/ubi8/python-39:latest     
-  ruby: registry.access.redhat.com/ubi9/ruby-31:1-50           
+  python: registry.access.redhat.com/ubi8/python-39:latest
+  ruby: registry.access.redhat.com/ubi9/ruby-31:1-50
   perl: registry.access.redhat.com/ubi9/perl-532:1-91
+  go: registry.access.redhat.com/ubi8/go-toolset:1.19.10-3
   nodejs: registry.access.redhat.com/ubi8/nodejs-18:latest
   php: registry.access.redhat.com/ubi9/php-81:1-29
 

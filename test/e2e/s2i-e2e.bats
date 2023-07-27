@@ -23,6 +23,8 @@ declare -rx E2E_S2I_LANGUAGE="${E2E_S2I_LANGUAGE:-}"
     run kubectl delete pipelinerun --all
     assert_success
 
+    kubectl apply -k test/e2e/resources/s2i/languages/${E2E_S2I_LANGUAGE}
+
     tkn pipeline start task-s2i \
         --param="URL=${E2E_S2I_PARAMS_URL}" \
         --param="REVISION=${E2E_S2I_PARAMS_REVISION}" \
@@ -30,15 +32,16 @@ declare -rx E2E_S2I_LANGUAGE="${E2E_S2I_LANGUAGE:-}"
         --param="TLS_VERIFY=${E2E_PARAMS_TLS_VERIFY}" \
         --param="VERBOSE=true" \
         --workspace="name=source,claimName=${E2E_S2I_PVC_NAME},subPath=${E2E_S2I_PVC_SUBPATH}" \
-        --filename=test/e2e/resources/pipeline-s2i-${E2E_S2I_LANGUAGE}.yaml \
         --showlog >&3
     assert_success
+
+    kubectl delete pipeline task-s2i
 
     # waiting a few seconds before asserting results
     sleep 30
 
-    # assering the pipelinerun status, making sure all steps have been successful
+    # asserting the pipelinerun status, making sure all steps have been successful
     assert_tekton_resource "pipelinerun" --partial '(Failed: 0, Cancelled 0), Skipped: 0'
-    # asserting the latest taskrun instacne to inspect the resources against a regular expression
+    # asserting the latest taskrun instance to inspect the resources against a regular expression
     assert_tekton_resource "taskrun" --regexp $'IMAGE_DIGEST=\S+.\nIMAGE_URL=\S+*'
 }

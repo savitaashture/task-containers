@@ -1,8 +1,0 @@
-resources:
-  - ../../base
-
-patches:
-  - path: ./s2i-perl.yaml
-    target:
-      kind: Pipeline
-      name: task-s2i

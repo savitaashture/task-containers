@@ -1,9 +1,10 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: task-s2i
   labels:
     name: task-s2i
+  name: task-s2i
 spec:
   workspaces:
     - name: source

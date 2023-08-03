@@ -1,3 +1,0 @@
-- op: replace
-  path: /spec/tasks/1/taskRef/name
-  value: s2i-ruby

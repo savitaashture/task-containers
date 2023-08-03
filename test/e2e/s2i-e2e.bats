@@ -23,9 +23,48 @@ declare -rx E2E_S2I_LANGUAGE="${E2E_S2I_LANGUAGE:-}"
     run kubectl delete pipelinerun --all
     assert_success
 
-    kubectl apply -k test/e2e/resources/s2i/languages/${E2E_S2I_LANGUAGE}
+    # declareing a kustomization which picks up the s2i pipeline resource and applies the contents of
+    # "patch.yaml" file, to be created next
+    cat <<EOF >${BASE_DIR}/kustomization.yaml
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - pipeline-s2i.yaml
+patches:
+  - path: patch.yaml
+    target:
+      kind: Pipeline
+      name: task-s2i
+EOF
+    assert_file_exist ${BASE_DIR}/kustomization.yaml
 
-    tkn pipeline start task-s2i \
+    # patches the Tekton Pipeline to specificy which s2i language is being tested, the underlying
+    # task name must be using the target language
+    cat <<EOF >${BASE_DIR}/patch.yaml
+---
+- op: replace
+  path: /metadata/name
+  value: task-s2i-${E2E_S2I_LANGUAGE}
+- op: replace
+  path: /spec/tasks/1/name
+  value: s2i-${E2E_S2I_LANGUAGE}
+- op: replace
+  path: /spec/tasks/1/taskRef/name
+  value: s2i-${E2E_S2I_LANGUAGE}
+EOF
+    assert_file_exist ${BASE_DIR}/patch.yaml
+
+    # copying the pipeline resource to the bats temporary directory, the file is altered by
+    # kutomizations defined previously
+    run cp -v test/e2e/resources/pipeline-s2i.yaml ${BASE_DIR}
+    assert_success
+
+    # applying all the resources on the directory with the kustomizations defined previously
+    run kubectl apply --kustomize ${BASE_DIR}
+    assert_success
+
+    tkn pipeline start task-s2i-${E2E_S2I_LANGUAGE} \
         --param="URL=${E2E_S2I_PARAMS_URL}" \
         --param="REVISION=${E2E_S2I_PARAMS_REVISION}" \
         --param="IMAGE=${E2E_S2I_PARAMS_IMAGE}" \
@@ -34,8 +73,6 @@ declare -rx E2E_S2I_LANGUAGE="${E2E_S2I_LANGUAGE:-}"
         --workspace="name=source,claimName=${E2E_S2I_PVC_NAME},subPath=${E2E_S2I_PVC_SUBPATH}" \
         --showlog >&3
     assert_success
-
-    kubectl delete pipeline task-s2i
 
     # waiting a few seconds before asserting results
     sleep 30

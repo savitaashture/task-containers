@@ -1,8 +1,0 @@
-resources:
-  - ../../base
-
-patches:
-  - path: ./s2i-nodejs.yaml
-    target:
-      kind: Pipeline
-      name: task-s2i

@@ -19,6 +19,11 @@ params:
     type: string
     description: |
       Fully qualified container image name to be built by s2i.
+  - name: ENV_VARS
+    type: array
+    default: []
+    description: |
+      Array containing string of Environment Variables as "KEY=VALUE"
 
 {{- include "params_buildah_common" . | nindent 2 }}
 {{- include "params_common" . | nindent 2 }}
@@ -55,6 +60,8 @@ steps:
         value: {{ $s2iBuilderImage }}
     command:
       - /scripts/s2i-generate.sh
+    args:
+      - "$(params.ENV_VARS[*])"
     securityContext:
       runAsUser: 0
     volumeMounts:

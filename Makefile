@@ -60,6 +60,9 @@ E2E_S2I_PARAMS_REVISION ?= master
 # s2i end-to-end test language of choice for using correct builder image
 E2E_S2I_LANGUAGE ?= python
 
+# s2i end-to-end test pipeline params adding env variables as a comma-separated string
+E2E_S2I_PARAMS_ENV_VARS ?= 
+
 # path to the github actions testing workflows
 ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
 
@@ -174,6 +177,16 @@ test-e2e-s2i-nodejs: E2E_S2I_LANGUAGE = nodejs
 test-e2e-s2i-nodejs: E2E_S2I_IMAGE_TAG = task-s2i-nodejs:latest
 test-e2e-s2i-nodejs: E2E_S2I_PARAMS_URL = https://github.com/ashadnasim52/sentiment-analysis
 test-e2e-s2i-nodejs: test-e2e-s2i
+
+# runs the end-to-end tests for s2i-dotnet
+.PHONY: test-e2e-s2i-dotnet
+test-e2e-s2i-dotnet: prepare-e2e-s2i
+test-e2e-s2i-dotnet: E2E_S2I_LANGUAGE = dotnet
+test-e2e-s2i-dotnet: E2E_S2I_IMAGE_TAG = task-s2i-dotnet:latest
+test-e2e-s2i-dotnet: E2E_S2I_PARAMS_URL = https://github.com/biswajitpanday/CleanArchitecture.Net6.git
+test-e2e-s2i-dotnet: E2E_S2I_PARAMS_REVISION = main
+test-e2e-s2i-dotnet: E2E_S2I_PARAMS_ENV_VARS = DOTNET_STARTUP_PROJECT=CleanArchitecture.Api/CleanArchitecture.Api.csproj
+test-e2e-s2i-dotnet: test-e2e-s2i
 
 # runs the end-to-end tests for s2i
 .PHONY: test-e2e-s2i

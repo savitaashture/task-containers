@@ -21,6 +21,8 @@ spec:
       type: string
     - name: VERBOSE
       type: string
+    - name: ENV_VARS
+      type: array
 
   tasks:
     - name: git
@@ -53,3 +55,5 @@ spec:
           value: "$(params.TLS_VERIFY)"
         - name: VERBOSE
           value: "$(params.VERBOSE)"
+        - name: ENV_VARS
+          value: "$(params.ENV_VARS[*])"

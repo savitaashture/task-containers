@@ -15,6 +15,7 @@ s2iBuilders:
   go: registry.access.redhat.com/ubi8/go-toolset:1.19.10-3
   nodejs: registry.access.redhat.com/ubi8/nodejs-18:latest
   php: registry.access.redhat.com/ubi9/php-81:1-29
+  dotnet: registry.access.redhat.com/ubi8/dotnet-60:6.0-37.20230802191230
 
 annotations:
   tekton.dev/pipelines.minVersion: "0.38.0"

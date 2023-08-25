@@ -51,6 +51,7 @@ fi
 phase "Generating the Containerfile for S2I builder image '${S2I_BUILDER_IMAGE}'"
 s2i --loglevel "${S2I_LOGLEVEL}" \
     build "${PARAMS_SUBDIRECTORY}" "${S2I_BUILDER_IMAGE}" \
+        --image-scripts-url "${PARAMS_IMAGE_SCRIPTS_URL}" \
         --as-dockerfile "${S2I_CONTAINERFILE_PATH}" \
         --environment-file "${S2I_ENVIRONMENT_FILE}"
 

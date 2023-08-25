@@ -60,6 +60,9 @@ E2E_S2I_PARAMS_REVISION ?= master
 # s2i end-to-end test language of choice for using correct builder image
 E2E_S2I_LANGUAGE ?= python
 
+# s2i's "image-script-url" flag for container-file generation
+E2E_S2I_IMAGE_SCRIPTS_URL ?= image:///usr/libexec/s2i
+
 # s2i end-to-end test pipeline params adding env variables as a comma-separated string
 E2E_S2I_PARAMS_ENV_VARS ?= 
 

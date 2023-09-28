@@ -6,6 +6,9 @@ CHART_VERSION ?= $(shell awk '/^version:/ { print $$2 }' Chart.yaml)
 BATS_CORE = ./test/.bats/bats-core/bin/bats
 BATS_FLAGS ?= --print-output-on-failure --show-output-of-passing-tests --verbose-run
 
+# release directory where the Tekton resources are rendered into.
+RELEASE_DIR ?= /tmp/$(CHART_NAME)-$(CHART_VERSION)
+
 # path to the bats test files, overwite the variables below to tweak the test scope
 E2E_TEST_DIR ?= ./test/e2e
 # based on the test directory, selecting all dot-bats files
@@ -86,6 +89,14 @@ helm-template:
 	$(call render-template)
 
 default: helm-template
+
+# renders all "task-*" named templates into the release directory, using the original
+# template filename as the Task name on release direcotry.
+helm-template-tasks:
+	mkdir -p $(RELEASE_DIR) || true
+	for t in `ls -1 templates/task-*.yaml`; do \
+		helm template --show-only=$$t . >$(RELEASE_DIR)/`basename $$t`; \
+	done
 
 # renders and installs the resources (task)
 install:

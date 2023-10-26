@@ -109,7 +109,7 @@ release: prepare-release
 github-release: RELEASE_VERSION = v$(CHART_VERSION)
 github-release: release
 	git tag $(RELEASE_VERSION) && \
-		git push $(RELEASE_VERSION) && \
+		git push origin --tags && \
 		gh release create $(RELEASE_VERSION) --generate-notes && \
 		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/catalog.yaml && \
 		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/resources.tar.gz
@@ -223,8 +223,8 @@ test-e2e-s2i-dotnet: test-e2e-s2i
 test-e2e-s2i-java: prepare-e2e-s2i
 test-e2e-s2i-java: E2E_S2I_LANGUAGE = java
 test-e2e-s2i-java: E2E_S2I_IMAGE_TAG = task-s2i-java:latest
-test-e2e-s2i-java: E2E_S2I_PARAMS_URL = https://github.com/shashirajraja/shopping-cart 
-test-e2e-s2i-java: E2E_S2I_PARAMS_ENV_VARS = MAVEN_CLEAR_REPO=false 
+test-e2e-s2i-java: E2E_S2I_PARAMS_URL = https://github.com/shashirajraja/shopping-cart
+test-e2e-s2i-java: E2E_S2I_PARAMS_ENV_VARS = MAVEN_CLEAR_REPO=false
 test-e2e-s2i-java: E2E_S2I_IMAGE_SCRIPTS_URL = image:///usr/local/s2i
 test-e2e-s2i-java: test-e2e-s2i
 

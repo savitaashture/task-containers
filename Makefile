@@ -75,8 +75,8 @@ ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
 # generic arguments employed on most of the targets
 ARGS ?=
 
-# making sure the variables declared in the Makefile are exported to the executables/scripts invoked
-# on all targets
+# making sure the variables declared in the Makefile are exported to the executables/scripts
+# invoked on all targets
 .EXPORT_ALL_VARIABLES:
 
 # uses helm to render the resource templates to the stdout
@@ -90,13 +90,29 @@ helm-template:
 
 default: helm-template
 
-# renders all "task-*" named templates into the release directory, using the original
-# template filename as the Task name on release direcotry.
-helm-template-tasks:
+# renders the task templates and copies documentation into the ${RELEASE_DIR}
+prepare-release:
 	mkdir -p $(RELEASE_DIR) || true
-	for t in `ls -1 templates/task-*.yaml`; do \
-		helm template --show-only=$$t . >$(RELEASE_DIR)/`basename $$t`; \
-	done
+	hack/release.sh $(RELEASE_DIR)
+
+# runs "catalog-cd release" to create the release payload based on the Tekton resources
+# prepared by the previous step
+release: prepare-release
+	mkdir -p $(RELEASE_DIR)/release || true
+	go run github.com/openshift-pipelines/tektoncd-catalog/cmd/catalog-cd@main release \
+		--output $(RELEASE_DIR)/release \
+		--version $(CHART_VERSION) \
+			$(RELEASE_DIR)/tasks/*
+
+# rolls out the current Chart version as the repository release version, uploads the release
+# payload prepared to GitHub (using gh)
+github-release: RELEASE_VERSION = v$(CHART_VERSION)
+github-release: release
+	git tag $(RELEASE_VERSION) && \
+		git push $(RELEASE_VERSION) && \
+		gh release create $(RELEASE_VERSION) --generate-notes && \
+		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/catalog.yaml && \
+		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/resources.tar.gz
 
 # renders and installs the resources (task)
 install:

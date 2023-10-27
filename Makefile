@@ -1,3 +1,5 @@
+SHELL := /usr/bin/env bash
+
 # using the chart name and version from chart's metadata
 CHART_NAME ?= $(shell awk '/^name:/ { print $$2 }' Chart.yaml)
 CHART_VERSION ?= $(shell awk '/^version:/ { print $$2 }' Chart.yaml)

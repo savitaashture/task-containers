@@ -98,11 +98,15 @@ prepare-release:
 # runs "catalog-cd release" to create the release payload based on the Tekton resources
 # prepared by the previous step
 release: prepare-release
-	mkdir -p $(RELEASE_DIR)/release || true
-	go run github.com/openshift-pipelines/tektoncd-catalog/cmd/catalog-cd@main release \
-		--output $(RELEASE_DIR)/release \
-		--version $(CHART_VERSION) \
-			$(RELEASE_DIR)/tasks/*
+	mkdir -p $(RELEASE_DIR) || true
+	pushd ${RELEASE_DIR} && \
+		go run github.com/openshift-pipelines/tektoncd-catalog/cmd/catalog-cd@main \
+			release \
+			--output . \
+			--version $(CHART_VERSION) \
+			tasks/* \
+		; \
+	popd
 
 # rolls out the current Chart version as the repository release version, uploads the release
 # payload prepared to GitHub (using gh)
@@ -111,8 +115,8 @@ github-release: release
 	git tag $(RELEASE_VERSION) && \
 		git push origin --tags && \
 		gh release create $(RELEASE_VERSION) --generate-notes && \
-		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/catalog.yaml && \
-		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/resources.tar.gz
+		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/catalog.yaml && \
+		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/resources.tar.gz
 
 # renders and installs the resources (task)
 install:

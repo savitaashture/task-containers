@@ -32,8 +32,7 @@ jobs:
       # settings to reach it during testing
       - uses: openshift-pipelines/setup-tektoncd@v1
         with:
-          pipeline_version: v0.41.0
-          cli_version: v0.29.1
+          pipeline_version: v0.41.3
 
       # running end-to-end test target
       - name: test-e2e

@@ -3,6 +3,7 @@ SHELL := /usr/bin/env bash
 # using the chart name and version from chart's metadata
 CHART_NAME ?= $(shell awk '/^name:/ { print $$2 }' Chart.yaml)
 CHART_VERSION ?= $(shell awk '/^version:/ { print $$2 }' Chart.yaml)
+RELEASE_VERSION = v$(CHART_VERSION)
 
 # bats entry point and default flags
 BATS_CORE = ./test/.bats/bats-core/bin/bats
@@ -104,21 +105,25 @@ release: prepare-release
 	pushd ${RELEASE_DIR} && \
 		go run github.com/openshift-pipelines/tektoncd-catalog/cmd/catalog-cd@main \
 			release \
-			--output . \
+			--output release \
 			--version $(CHART_VERSION) \
 			tasks/* \
 		; \
 	popd
 
+# tags the repository with the RELEASE_VERSION and pushes to "origin"
+git-tag-release-version:
+	if ! git rev-list "${RELEASE_VERSION}".. >/dev/null; then \
+		git tag "$(RELEASE_VERSION)" && \
+			git push origin --tags; \
+	fi
+
 # rolls out the current Chart version as the repository release version, uploads the release
 # payload prepared to GitHub (using gh)
-github-release: RELEASE_VERSION = v$(CHART_VERSION)
-github-release: release
-	git tag $(RELEASE_VERSION) && \
-		git push origin --tags && \
-		gh release create $(RELEASE_VERSION) --generate-notes && \
-		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/catalog.yaml && \
-		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/resources.tar.gz
+github-release: git-tag-release-version release
+	gh release create $(RELEASE_VERSION) --generate-notes && \
+		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/catalog.yaml && \
+		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/resources.tar.gz
 
 # renders and installs the resources (task)
 install:

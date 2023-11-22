@@ -17,6 +17,15 @@ declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
     run kubectl delete taskrun --all
     assert_success
 
+
+    kubectl delete secret regcred || true
+    run kubectl create secret generic regcred \
+        --from-file=.dockerconfigjson=$HOME/.docker/config.json \
+        --type=kubernetes.io/dockerconfigjson
+    assert_success
+    run kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "regcred"}]}'
+    assert_success
+
     #
     # E2E TaskRun
     #

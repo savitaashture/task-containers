@@ -18,7 +18,7 @@ E2E_TEST_DIR ?= ./test/e2e
 E2E_TESTS ?= $(E2E_TEST_DIR)/*.bats
 
 # external task dependency to run the end-to-end tests pipeline
-TASK_GIT ?= https://github.com/openshift-pipelines/task-git/releases/download/0.0.1/task-git-0.0.1.yaml
+TASK_GIT ?= https://github.com/openshift-pipelines/task-git/releases/download/0.1.0/task-git-0.1.0.yaml
 
 # container registry URL, usually hostname and port
 REGISTRY_URL ?= registry.registry.svc.cluster.local:32222

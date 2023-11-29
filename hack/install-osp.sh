@@ -7,6 +7,11 @@ set -o pipefail
 
 readonly export DEPLOYMENT_TIMEOUT="${DEPLOYMENT_TIMEOUT:-5m}"
 
+function fail() {
+    echo "ERROR: ${*}" >&2
+    exit 1
+}
+
 function rollout_status() {
     local namespace="${1}"
     local deployment="${2}"
@@ -31,7 +36,7 @@ case "$OSP_VERSION" in
     CHANNEL="latest"
     ;;
   *)
-    CHANNEL="pipeline-$OSP_VERSION"
+    CHANNEL="pipelines-$OSP_VERSION"
     ;;
 esac
 
@@ -40,7 +45,7 @@ cat <<EOF | oc apply -f-
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: openshift-pipeline-operator
+  name: openshift-pipelines-operator-rh
   namespace: openshift-operators
 spec:
   channel: ${CHANNEL}
@@ -49,8 +54,9 @@ spec:
   sourceNamespace: openshift-marketplace
 EOF
 
+# FIXME(vdemeester) do better than waiting 2m for the namespace to appear
 echo "Waiting for OpenShift Pipelines Operator to be available"
-sleep 60
+sleep 120
 
 rollout_status "openshift-pipelines" "tekton-pipelines-controller"
 rollout_status "openshift-pipelines" "tekton-pipelines-webhook"

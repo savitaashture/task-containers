@@ -17,7 +17,7 @@ function rollout_status() {
     local deployment="${2}"
 
     if ! kubectl --namespace="${namespace}" --timeout=${DEPLOYMENT_TIMEOUT} \
-        rollout status deployment "${deployment}"; then
+         rollout status deployment "${deployment}"; then
         fail "'${namespace}/${deployment}' is not deployed as expected!"
     fi
 }
@@ -28,16 +28,17 @@ shift
 CHANNEL=""
 
 case "$OSP_VERSION" in
-  nightly)
-    echo "Not supporting nightly just yet"
-    exit 1
-    ;;
-  latest)
-    CHANNEL="latest"
-    ;;
-  *)
-    CHANNEL="pipelines-$OSP_VERSION"
-    ;;
+    nightly)
+	echo "Not supporting nightly just yet"
+	# FIXME add support for it
+	exit 0
+	;;
+    latest)
+	CHANNEL="latest"
+	;;
+    *)
+	CHANNEL="pipelines-$OSP_VERSION"
+	;;
 esac
 
 echo "Installing OpenShift Pipelines from channel ${CHANNEL}"

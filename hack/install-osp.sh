@@ -64,3 +64,6 @@ rollout_status "openshift-pipelines" "tekton-pipelines-webhook"
 
 oc get -n openshift-pipelines pods
 tkn version
+
+# Make sure we are on the default project
+oc project default

@@ -68,13 +68,6 @@ EOF
     run kubectl apply --kustomize ${BASE_DIR}
     assert_success
 
-    kubectl delete secret regcred || true
-    run kubectl create secret generic regcred \
-        --from-file=.dockerconfigjson=$HOME/.docker/config.json \
-        --type=kubernetes.io/dockerconfigjson
-    assert_success
-    run kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "regcred"}]}'
-    assert_success
 
     tkn pipeline start task-s2i-${E2E_S2I_LANGUAGE} \
         --param="URL=${E2E_S2I_PARAMS_URL}" \

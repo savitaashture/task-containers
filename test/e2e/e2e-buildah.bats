@@ -12,15 +12,6 @@ declare -rx E2E_BUILDAH_PARAMS_IMAGE="${E2E_BUILDAH_PARAMS_IMAGE:-}"
     [ -n "${E2E_BUILDAH_PARAMS_IMAGE}" ]
     [ -n "${E2E_PARAMS_TLS_VERIFY}" ]
 
-
-    kubectl delete secret regcred || true
-    run kubectl create secret generic regcred \
-        --from-file=.dockerconfigjson=$HOME/.docker/config.json \
-        --type=kubernetes.io/dockerconfigjson
-    assert_success
-    run kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "regcred"}]}'
-    assert_success
-
     # cleaning up all the existing resources before starting a new taskrun, the test assertion
     # will describe the objects on the current namespace
     run kubectl delete taskrun --all

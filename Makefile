@@ -1,5 +1,7 @@
 SHELL := /usr/bin/env bash
 
+OSP_VERSION ?= latest
+
 # using the chart name and version from chart's metadata
 CHART_NAME ?= $(shell awk '/^name:/ { print $$2 }' Chart.yaml)
 CHART_VERSION ?= $(shell awk '/^version:/ { print $$2 }' Chart.yaml)
@@ -251,6 +253,12 @@ test-e2e-s2i: bats
 test-e2e: prepare-e2e-buildah
 test-e2e: prepare-e2e-s2i
 test-e2e: bats
+
+# Run all the end-to-end tests against the current openshift context.
+# It is used mainly by the CI and ideally shouldn't differ that much from test-e2e
+.PHONY: test-e2e-openshift
+test-e2e-openshift:
+	./hack/install-osp.sh $(OSP_VERSION)
 
 # act runs the github actions workflows, so by default only running the test workflow (integration
 # and end-to-end) to avoid running the release workflow accidentally

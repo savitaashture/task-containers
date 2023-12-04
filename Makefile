@@ -30,6 +30,7 @@ REGISTRY_NAMESPACE ?= task-containers
 IMAGE_BASE ?= $(REGISTRY_URL)/$(REGISTRY_NAMESPACE)
 
 # skopeo-copy task e2e test variables, source, destination url and tls-verify parameter.
+# Could use cgr.dev/chainguard/static as well
 E2E_SC_PARAMS_SOURCE ?= docker://docker.io/library/busybox:latest
 # end-to-end test destination image name and tag
 E2E_SC_IMAGE_TAG ?= busybox:latest
@@ -39,15 +40,6 @@ E2E_SC_PARAMS_DESTINATION ?= docker://$(IMAGE_BASE)/${E2E_SC_IMAGE_TAG}
 # setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
 # using the internal container registry (HTTP based)
 E2E_PARAMS_TLS_VERIFY ?= false
-
-# workspace "source" pvc resource and name
-E2E_BUILDAH_PVC ?= test/e2e/resources/pvc-buildah.yaml
-E2E_BUILDAH_PVC_NAME ?= task-buildah
-
-# workspace "source" pvc resource and name for s2i task tests
-E2E_S2I_PVC ?= test/e2e/resources/pvc-s2i.yaml
-E2E_S2I_PVC_NAME ?= task-s2i
-E2E_S2I_PVC_SUBPATH ?= source
 
 # auxiliary task to create a Containerfile for buildah end-to-end testing
 E2E_BUILDAH_TASK_CONTAINERFILE_STUB ?= test/e2e/resources/task-containerfile-stub.yaml
@@ -124,8 +116,8 @@ git-tag-release-version:
 # payload prepared to GitHub (using gh)
 github-release: git-tag-release-version release
 	gh release create $(RELEASE_VERSION) --generate-notes && \
-		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/catalog.yaml && \
-		gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/resources.tar.gz
+	gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/catalog.yaml && \
+	gh release upload $(RELEASE_VERSION) $(RELEASE_DIR)/release/resources.tar.gz
 
 # renders and installs the resources (task)
 install:
@@ -150,12 +142,10 @@ task-git:
 .PHONY: prepare-e2e-buildah
 prepare-e2e-buildah: task-git
 	kubectl apply -f $(E2E_BUILDAH_TASK_CONTAINERFILE_STUB)
-	kubectl apply -f $(E2E_BUILDAH_PVC)
 
 # prepares the s2i end-to-end tests, installs the required resources
 .PHONY: prepare-e2e-s2i
 prepare-e2e-s2i: task-git
-	kubectl apply -f $(E2E_S2I_PVC)
 
 # runs bats-core against the pre-determined tests
 .PHONY: bats
@@ -167,11 +157,24 @@ bats: install
 test-e2e-skopeo-copy: E2E_TESTS = $(E2E_TEST_DIR)/*skopeo-copy*.bats
 test-e2e-skopeo-copy: bats
 
+.PHONY: test-e2e-skopeo-copy-openshift
+test-e2e-skopeo-copy-openshift: REGISTRY_URL = image-registry.openshift-image-registry.svc.cluster.local:5000
+test-e2e-skopeo-copy-openshift: REGISTRY_NAMESPACE = $(shell oc project -q)
+test-e2e-skopeo-copy-openshift: E2E_TESTS = $(E2E_TEST_DIR)/*skopeo-copy*.bats
+test-e2e-skopeo-copy-openshift: bats
+
 # runs the end-to-end tests for buildah
 .PHONY: test-e2e-buildah
 test-e2e-buildah: prepare-e2e-buildah
 test-e2e-buildah: E2E_TESTS = $(E2E_TEST_DIR)/*buildah*.bats
 test-e2e-buildah: bats
+
+.PHONY: test-e2e-buildah-openshift
+test-e2e-buildah-openshift: prepare-e2e-buildah
+test-e2e-buildah-openshift: REGISTRY_URL = image-registry.openshift-image-registry.svc.cluster.local:5000
+test-e2e-buildah-openshift: REGISTRY_NAMESPACE = $(shell oc project -q)
+test-e2e-buildah-openshift: E2E_TESTS = $(E2E_TEST_DIR)/*buildah*.bats
+test-e2e-buildah-openshift: bats
 
 # runs the end-to-end tests for s2i-python
 .PHONY: test-e2e-s2i-python
@@ -247,20 +250,30 @@ test-e2e-s2i: prepare-e2e-s2i
 test-e2e-s2i: E2E_TESTS = $(E2E_TEST_DIR)/*s2i*.bats
 test-e2e-s2i: bats
 
+.PHONY: test-e2e-s2i-openshift
+test-e2e-s2i-openshift: prepare-e2e-s2i
+test-e2e-s2i-openshift: REGISTRY_URL = image-registry.openshift-image-registry.svc.cluster.local:5000
+test-e2e-s2i-openshift: REGISTRY_NAMESPACE = $(shell oc project -q)
+test-e2e-s2i-openshift: E2E_TESTS = $(E2E_TEST_DIR)/*s2i*.bats
+test-e2e-s2i-openshift: bats
+
 # runs all the end-to-end tests against the current kubernetes context, it will required a cluster
 # with Tekton Pipelines (OpenShift Pipelines) and a container registry instance
 .PHONY: test-e2e
 test-e2e: prepare-e2e-buildah
 test-e2e: prepare-e2e-s2i
-test-e2e: bats
+test-e2e: test-e2e-buildah test-e2e-skopeo-copy test-e2e-s2i
 
 # Run all the end-to-end tests against the current openshift context.
 # It is used mainly by the CI and ideally shouldn't differ that much from test-e2e
 .PHONY: prepare-e2e-openshift
 prepare-e2e-openshift:
 	./hack/install-osp.sh $(OSP_VERSION)
+
 .PHONY: test-e2e-openshift
 test-e2e-openshift: prepare-e2e-openshift
+test-e2e-openshift: REGISTRY_URL = image-registry.openshift-image-registry.svc.cluster.local:5000
+test-e2e-openshift: REGISTRY_NAMESPACE = $(shell oc project -q)
 test-e2e-openshift: test-e2e
 
 # act runs the github actions workflows, so by default only running the test workflow (integration

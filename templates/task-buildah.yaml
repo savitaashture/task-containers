@@ -19,18 +19,24 @@ spec:
       optional: false
       description: |
         Container build context, like for instnace a application source code
-        followed by a `Containerfile`.
-
+        followed by a `Dockerfile`.
+    - name: dockerconfig
+      description: >-
+        An optional workspace that allows providing a .docker/config.json file
+        for Buildah to access the container registry.
+        The file should be placed at the root of the Workspace with name config.json
+        or .dockerconfigjson.
+      optional: true
   params:
     - name: IMAGE
       type: string
       description: |
         Fully qualified container image name to be built by buildah.
-    - name: CONTAINERFILE_PATH
+    - name: DOCKERFILE
       type: string
-      default: Containerfile
+      default: ./Dockerfile
       description: |
-        Path to the `Containerfile` (or `Dockerfile`) relative to the `source` workspace.
+        Path to the `Dockerfile` (or `Containerfile`) relative to the `source` workspace.
 
 {{- include "params_buildah_common" . | nindent 4 }}
 {{- include "params_common" . | nindent 4 }}
@@ -42,8 +48,9 @@ spec:
     env:
 {{- $variables := list
       "params.IMAGE"
-      "params.SUBDIRECTORY"
-      "params.CONTAINERFILE_PATH"
+      "params.CONTEXT"
+      "params.DOCKERFILE"
+      "params.FORMAT"
       "params.STORAGE_DRIVER"
       "params.BUILD_EXTRA_ARGS"
       "params.PUSH_EXTRA_ARGS"
@@ -52,6 +59,8 @@ spec:
       "params.VERBOSE"
       "workspaces.source.bound"
       "workspaces.source.path"
+      "workspaces.dockerconfig.bound"
+      "workspaces.dockerconfig.path"
       "results.IMAGE_URL.path"
       "results.IMAGE_DIGEST.path"
 }}
@@ -66,7 +75,8 @@ spec:
       command:
         - /scripts/buildah-bud.sh
       securityContext:
-        privileged: true
+        capabilities:
+          add: ["SETFCAP"]
       volumeMounts:
         - name: scripts-dir
           mountPath: /scripts

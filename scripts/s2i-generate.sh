@@ -30,9 +30,9 @@ phase "Inspecting source workspace '${WORKSPACES_SOURCE_PATH}' (PWD='${PWD}')"
 [[ "${WORKSPACES_SOURCE_BOUND}" != "true" ]] &&
     fail "Workspace 'source' is not bounded"
 
-phase "Inspecting context subdirectory '${PARAMS_SUBDIRECTORY}'"
-[[ ! -d "${PARAMS_SUBDIRECTORY}" ]] &&
-    fail "Application source code directory not found at '${PARAMS_SUBDIRECTORY}'"
+phase "Inspecting context '${PARAMS_CONTEXT}'"
+[[ ! -d "${PARAMS_CONTEXT}" ]] &&
+    fail "Application source code directory not found at '${PARAMS_CONTEXT}'"
 
 phase "Adding the environment variables to '${S2I_ENVIRONMENT_FILE}'"
 
@@ -48,17 +48,17 @@ fi
 # S2I Generate
 #
 
-phase "Generating the Containerfile for S2I builder image '${S2I_BUILDER_IMAGE}'"
+phase "Generating the Dockerfile for S2I builder image '${S2I_BUILDER_IMAGE}'"
 s2i --loglevel "${S2I_LOGLEVEL}" \
-    build "${PARAMS_SUBDIRECTORY}" "${S2I_BUILDER_IMAGE}" \
+    build "${PARAMS_CONTEXT}" "${S2I_BUILDER_IMAGE}" \
         --image-scripts-url "${PARAMS_IMAGE_SCRIPTS_URL}" \
-        --as-dockerfile "${S2I_CONTAINERFILE_PATH}" \
+        --as-dockerfile "${S2I_DOCKERFILE}" \
         --environment-file "${S2I_ENVIRONMENT_FILE}"
 
-phase "Inspecting the Containerfile generated at '${S2I_CONTAINERFILE_PATH}'"
-[[ ! -f "${S2I_CONTAINERFILE_PATH}" ]] &&
-    fail "Generated Containerfile is not found!"
+phase "Inspecting the Dockerfile generated at '${S2I_DOCKERFILE}'"
+[[ ! -f "${S2I_DOCKERFILE}" ]] &&
+    fail "Generated Dockerfile is not found!"
 
 set +x
-phase "Generated Containerfile payload"
-echo -en ">>> ${S2I_CONTAINERFILE_PATH}\n$(cat ${S2I_CONTAINERFILE_PATH})\n<<< EOF\n"
+phase "Generated Dockerfile payload"
+echo -en ">>> ${S2I_DOCKERFILE}\n$(cat ${S2I_DOCKERFILE})\n<<< EOF\n"

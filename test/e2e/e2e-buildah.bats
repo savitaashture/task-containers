@@ -8,7 +8,6 @@ declare -rx E2E_BUILDAH_PARAMS_IMAGE="${E2E_BUILDAH_PARAMS_IMAGE:-}"
 # Testing the Buildah task,
 @test "[e2e] buildah task is able to build and push a container image" {
     # asserting all required configuration is informed
-    [ -n "${E2E_BUILDAH_PVC_NAME}" ]
     [ -n "${E2E_BUILDAH_PARAMS_IMAGE}" ]
     [ -n "${E2E_PARAMS_TLS_VERIFY}" ]
 
@@ -28,7 +27,7 @@ declare -rx E2E_BUILDAH_PARAMS_IMAGE="${E2E_BUILDAH_PARAMS_IMAGE:-}"
         --param="IMAGE=${E2E_BUILDAH_PARAMS_IMAGE}" \
         --param="TLS_VERIFY=${E2E_PARAMS_TLS_VERIFY}" \
         --param="VERBOSE=true" \
-        --workspace="name=source,claimName=${E2E_BUILDAH_PVC_NAME},subPath=source" \
+	--workspace name=source,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
         --filename=test/e2e/resources/pipeline-buildah.yaml \
         --showlog >&3
     assert_success

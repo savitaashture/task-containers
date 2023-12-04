@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Wrapper around "buildah bud" to build and push a container image based on a Containerfile.
+# Wrapper around "buildah bud" to build and push a container image based on a Dockerfile.
 #
 
 shopt -s inherit_errexit
@@ -26,28 +26,47 @@ phase "Inspecting source workspace '${WORKSPACES_SOURCE_PATH}' (PWD='${PWD}')"
 [[ "${WORKSPACES_SOURCE_BOUND}" != "true" ]] &&
     fail "Workspace 'source' is not bounded"
 
-phase "Asserting the container-file '${CONTAINERFILE_PATH_FULL}' exists"
-[[ ! -f "${CONTAINERFILE_PATH_FULL}" ]] &&
-    fail "Containerfile not found at: '${CONTAINERFILE_PATH_FULL}'"
+phase "Asserting the dockerfile/containerfile '${DOCKERFILE_FULL}' exists"
+[[ ! -f "${DOCKERFILE_FULL}" ]] &&
+    fail "Dockerfile not found at: '${DOCKERFILE_FULL}'"
 
-phase "Inspecting context subdirectory '${PARAMS_SUBDIRECTORY}'"
-[[ ! -d "${PARAMS_SUBDIRECTORY}" ]] &&
-    fail "SUBDIRECTORY param is not found at '${PARAMS_SUBDIRECTORY}', on source workspace"
+phase "Inspecting context '${PARAMS_CONTEXT}'"
+[[ ! -d "${PARAMS_CONTEXT}" ]] &&
+    fail "CONTEXT param is not found at '${PARAMS_CONTEXT}', on source workspace"
+
+# Handle optional dockerconfig secret
+if [[ "${WORKSPACES_DOCKERCONFIG_BOUND}" == "true" ]]; then
+
+    # if config.json exists at workspace root, we use that
+    if test -f "${WORKSPACES_DOCKERCONFIG_PATH}/config.json"; then
+        export DOCKER_CONFIG="${WORKSPACES_DOCKERCONFIG_PATH}"
+
+        # else we look for .dockerconfigjson at the root
+    elif test -f "${WORKSPACES_DOCKERCONFIG_PATH}/.dockerconfigjson"; then
+        cp "${WORKSPACES_DOCKERCONFIG_PATH}/.dockerconfigjson" "$HOME/.docker/config.json"
+        export DOCKER_CONFIG="$HOME/.docker"
+
+        # need to error out if neither files are present
+    else
+        echo "neither 'config.json' nor '.dockerconfigjson' found at workspace root"
+        exit 1
+    fi
+fi
 
 #
 # Build
 #
 
-phase "Building '${PARAMS_IMAGE}' based on '${CONTAINERFILE_PATH_FULL}'"
+phase "Building '${PARAMS_IMAGE}' based on '${DOCKERFILE_FULL}'"
 
 [[ -n "${PARAMS_BUILD_EXTRA_ARGS}" ]] &&
     phase "Extra 'buildah bud' arguments informed: '${PARAMS_BUILD_EXTRA_ARGS}'"
 
 _buildah bud ${PARAMS_BUILD_EXTRA_ARGS} \
     --no-cache \
-    --file="${CONTAINERFILE_PATH_FULL}" \
+    --file="${DOCKERFILE_FULL}" \
     --tag="${PARAMS_IMAGE}" \
-    ${PARAMS_SUBDIRECTORY}
+    ${PARAMS_CONTEXT}
 
 if [[ "${PARAMS_SKIP_PUSH}" == "true" ]]; then
     phase "Skipping pushing '${PARAMS_IMAGE}' to the container registry!"

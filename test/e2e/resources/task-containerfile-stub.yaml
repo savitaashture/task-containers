@@ -11,4 +11,11 @@ spec:
       image: registry.access.redhat.com/ubi9-minimal:latest
       workingDir: /workspace/source
       script: |
-        bash -x -c "echo 'FROM scratch' >Containerfile; ls -l ${PWD}/Containerfile"
+        set -x
+        cat <<EOF > Dockerfile
+        FROM registry.access.redhat.com/ubi9-minimal
+        RUN ls -la / > ls.txt
+        EOF
+
+        ls -l ${PWD}/Dockerfile
+        cat ${PWD}/Dockerfile

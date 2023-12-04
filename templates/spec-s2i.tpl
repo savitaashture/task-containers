@@ -41,7 +41,8 @@ stepTemplate:
 {{- $variables := list
       "params.IMAGE"
       "params.IMAGE_SCRIPTS_URL"
-      "params.SUBDIRECTORY"
+      "params.CONTEXT"
+      "params.FORMAT"
       "params.STORAGE_DRIVER"
       "params.BUILD_EXTRA_ARGS"
       "params.PUSH_EXTRA_ARGS"
@@ -50,6 +51,8 @@ stepTemplate:
       "params.VERBOSE"
       "workspaces.source.bound"
       "workspaces.source.path"
+      "workspaces.dockerconfig.bound"
+      "workspaces.dockerconfig.path"
       "results.IMAGE_URL.path"
       "results.IMAGE_DIGEST.path"
 }}
@@ -69,7 +72,8 @@ steps:
     args:
       - "$(params.ENV_VARS[*])"
     securityContext:
-      runAsUser: 0
+      capabilities:
+        add: ["SETFCAP"]
     volumeMounts:
       - name: scripts-dir
         mountPath: /scripts
@@ -82,7 +86,8 @@ steps:
     command:
       - /scripts/s2i-build.sh
     securityContext:
-      privileged: true
+      capabilities:
+        add: ["SETFCAP"]
     volumeMounts:
       - name: scripts-dir
         mountPath: /scripts

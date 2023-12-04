@@ -4,17 +4,20 @@
 
 */ -}}
 {{- define "params_buildah_common" -}}
-- name: SUBDIRECTORY
+- name: CONTEXT
   type: string
   default: "."
   description: |
-    Relative subdirectory to the `source` Workspace for the build-context.
+    Path to the directory to use as context.
 - name: STORAGE_DRIVER
   type: string
-  default: overlay
+  default: vfs
   description: |
     Set buildah storage driver to reflect the currrent cluster node's
     settings.
+- name: FORMAT
+  description: The format of the built container, oci or docker
+  default: "oci"
 - name: BUILD_EXTRA_ARGS
   type: string
   default: ""

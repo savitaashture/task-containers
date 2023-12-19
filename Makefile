@@ -19,9 +19,6 @@ E2E_TEST_DIR ?= ./test/e2e
 # based on the test directory, selecting all dot-bats files
 E2E_TESTS ?= $(E2E_TEST_DIR)/*.bats
 
-# external task dependency to run the end-to-end tests pipeline
-TASK_GIT ?= https://github.com/openshift-pipelines/task-git/releases/download/0.2.0/task-git-0.2.0.yaml
-
 # container registry URL, usually hostname and port
 REGISTRY_URL ?= registry.registry.svc.cluster.local:32222
 # container registry namespace, as in the section of the registry allowed to push images
@@ -132,20 +129,14 @@ helm-package: clean
 	helm package $(ARGS) .
 	tar -ztvpf $(CHART_NAME)-$(CHART_VERSION).tgz
 
-# installs "git" task directly from the informed location, the task is required to run the test-e2e
-# target, it will hold the "source" workspace data
-.PHONY: task-git
-task-git:
-	kubectl apply -f $(TASK_GIT)
-
 # prepares the buildah end-to-end tests, installs the required resources
 .PHONY: prepare-e2e-buildah
-prepare-e2e-buildah: task-git
+prepare-e2e-buildah: 
 	kubectl apply -f $(E2E_BUILDAH_TASK_CONTAINERFILE_STUB)
 
 # prepares the s2i end-to-end tests, installs the required resources
 .PHONY: prepare-e2e-s2i
-prepare-e2e-s2i: task-git
+prepare-e2e-s2i:
 
 # runs bats-core against the pre-determined tests
 .PHONY: bats

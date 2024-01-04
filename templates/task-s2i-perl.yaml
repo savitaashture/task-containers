@@ -1,6 +1,6 @@
 {{- $s2iBuilderImage := .Values.s2iBuilders.perl -}}
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: s2i-perl

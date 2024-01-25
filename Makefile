@@ -1,4 +1,5 @@
 SHELL := /usr/bin/env bash
+BIN = $(CURDIR)/.bin
 
 OSP_VERSION ?= latest
 
@@ -6,6 +7,8 @@ OSP_VERSION ?= latest
 CHART_NAME ?= $(shell awk '/^name:/ { print $$2 }' Chart.yaml)
 CHART_VERSION ?= $(shell awk '/^version:/ { print $$2 }' Chart.yaml)
 RELEASE_VERSION = v$(CHART_VERSION)
+
+CATALOGCD_VERSION = v0.1.0
 
 # bats entry point and default flags
 BATS_CORE = ./test/.bats/bats-core/bin/bats
@@ -78,6 +81,13 @@ define render-template
 	@helm template $(ARGS) .
 endef
 
+$(BIN):
+	@mkdir -p $@
+
+CATALOGCD = $(or ${CATALOGCD_BIN},${CATALOGCD_BIN},$(BIN)/catalog-cd)
+$(BIN)/catalog-cd: $(BIN)
+	curl -fsL https://github.com/openshift-pipelines/catalog-cd/releases/download/v0.1.0/catalog-cd_0.1.0_linux_x86_64.tar.gz | tar xzf - -C $(BIN) catalog-cd
+
 # renders the task resource file printing it out on the standard output
 helm-template:
 	$(call render-template)
@@ -91,11 +101,10 @@ prepare-release:
 
 # runs "catalog-cd release" to create the release payload based on the Tekton resources
 # prepared by the previous step
-release: prepare-release
+release: $(CATALOGCD) prepare-release
 	mkdir -p $(RELEASE_DIR) || true
 	pushd ${RELEASE_DIR} && \
-		go run github.com/openshift-pipelines/tektoncd-catalog/cmd/catalog-cd@main \
-			release \
+		$(CATALOGCD) release \
 			--output release \
 			--version $(CHART_VERSION) \
 			tasks/* \

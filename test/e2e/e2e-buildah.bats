@@ -38,5 +38,5 @@ declare -rx E2E_BUILDAH_PARAMS_IMAGE="${E2E_BUILDAH_PARAMS_IMAGE:-}"
     # assering the pipelinerun status, making sure all steps have been successful
     assert_tekton_resource "pipelinerun" --partial '(Failed: 0, Cancelled 0), Skipped: 0'
     # asserting the latest taskrun instacne to inspect the resources against a regular expression
-    assert_tekton_resource "taskrun" --regexp $'IMAGE_DIGEST=\S+.\nIMAGE_URL=\S+*'
+    assert_tekton_resource "taskrun" --regexp $'.*\n?IMAGE_DIGEST=\S+.\nIMAGE_URL=\S+'
 }

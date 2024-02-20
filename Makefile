@@ -129,6 +129,10 @@ github-release: git-tag-release-version release
 install:
 	$(call render-template) |kubectl $(ARGS) apply -f -
 
+# renders and remove the resources (task)
+remove:
+	$(call render-template) |kubectl $(ARGS) delete -f -
+
 # removes the package helm chart, and also the chart-releaser temporary directories
 clean:
 	rm -f $(CHART_NAME)-*.tgz >/dev/null 2>&1 || true

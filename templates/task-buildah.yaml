@@ -27,6 +27,13 @@ spec:
         The file should be placed at the root of the Workspace with name config.json
         or .dockerconfigjson.
       optional: true
+    - name: rhel-entitlement
+      description: >-
+        An optional workspace that allows providing the entitlement keys
+        for Buildah to access subscription. The mounted workspace contains
+        entitlement.pem and entitlement-key.pem.
+      optional: true
+      mountPath: /tmp/entitlement
   params:
     - name: IMAGE
       type: string
@@ -61,6 +68,8 @@ spec:
       "workspaces.source.path"
       "workspaces.dockerconfig.bound"
       "workspaces.dockerconfig.path"
+      "workspaces.rhel-entitlement.bound"
+      "workspaces.rhel-entitlement.path"
       "results.IMAGE_URL.path"
       "results.IMAGE_DIGEST.path"
 }}

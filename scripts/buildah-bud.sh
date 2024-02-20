@@ -57,6 +57,11 @@ if [[ "${WORKSPACES_DOCKERCONFIG_BOUND}" == "true" ]]; then
     fi
 fi
 
+ENTITLEMENT_VOLUME=""
+if [[ "${WORKSPACES_RHEL_ENTITLEMENT_BOUND}" == "true" ]]; then
+    ENTITLEMENT_VOLUME="--volume ${WORKSPACES_RHEL_ENTITLEMENT_PATH}:/etc/pki/entitlement"
+fi
+
 #
 # Build
 #
@@ -67,6 +72,7 @@ phase "Building '${PARAMS_IMAGE}' based on '${DOCKERFILE_FULL}'"
     phase "Extra 'buildah bud' arguments informed: '${PARAMS_BUILD_EXTRA_ARGS}'"
 
 _buildah bud ${PARAMS_BUILD_EXTRA_ARGS} \
+    $ENTITLEMENT_VOLUME \
     --no-cache \
     --file="${DOCKERFILE_FULL}" \
     --tag="${PARAMS_IMAGE}" \

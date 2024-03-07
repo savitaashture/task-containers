@@ -43,6 +43,10 @@ if [[ "${WORKSPACES_DOCKERCONFIG_BOUND}" == "true" ]]; then
 
         # else we look for .dockerconfigjson at the root
     elif test -f "${WORKSPACES_DOCKERCONFIG_PATH}/.dockerconfigjson"; then
+        # ensure .docker exist before the copying the content
+        if [ ! -d "$HOME/.docker" ]; then
+           mkdir -p "$HOME/.docker"
+        fi
         cp "${WORKSPACES_DOCKERCONFIG_PATH}/.dockerconfigjson" "$HOME/.docker/config.json"
         export DOCKER_CONFIG="$HOME/.docker"
 

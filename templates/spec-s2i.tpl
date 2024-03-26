@@ -13,7 +13,12 @@ workspaces:
     optional: false
     description: |
       Application source code, the build context for S2I workflow.
-
+  - name: dockerconfig
+    optional: true
+    description: >-
+        An optional workspace that allows providing a .docker/config.json file for Buildah to access the container registry.
+        The file should be placed at the root of the Workspace with name config.json.
+        
 params:
   - name: IMAGE
     type: string

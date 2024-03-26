@@ -84,5 +84,5 @@ EOF
     # asserting the pipelinerun status, making sure all steps have been successful
     assert_tekton_resource "pipelinerun" --partial '(Failed: 0, Cancelled 0), Skipped: 0'
     # asserting the latest taskrun instance to inspect the resources against a regular expression
-    assert_tekton_resource "taskrun" --regexp $'.*\n?IMAGE_DIGEST=\S+.\nIMAGE_URL=\S+*'
+    assert_tekton_resource "taskrun" --regexp $'\S+\n?IMAGE_DIGEST=\S+.\nIMAGE_URL=\S+*'
 }

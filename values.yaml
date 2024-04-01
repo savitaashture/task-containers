@@ -4,8 +4,8 @@ images:
   bash: registry.access.redhat.com/ubi8-minimal:8.9
   skopeo: registry.access.redhat.com/ubi8/skopeo:8.9
   buildah: registry.access.redhat.com/ubi8/buildah:8.9
-  s2i: registry.redhat.io/source-to-image/source-to-image-rhel8:v1.3.9-6
-
+  s2i: registry.access.redhat.com/source-to-image/source-to-image-rhel8:v1.3.9-6
+  
 # source-to-image builder images, each language represents a distinct ecosystem the builder supports,
 # sometimes it includes a specific version
 s2iBuilders:

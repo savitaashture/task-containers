@@ -147,10 +147,6 @@ helm-package: clean
 prepare-e2e-buildah: 
 	kubectl apply -f $(E2E_BUILDAH_TASK_CONTAINERFILE_STUB)
 
-# prepares the s2i end-to-end tests, installs the required resources
-.PHONY: prepare-e2e-s2i
-prepare-e2e-s2i:
-
 # runs bats-core against the pre-determined tests
 .PHONY: bats
 bats: install
@@ -182,7 +178,6 @@ test-e2e-buildah-openshift: bats
 
 # runs the end-to-end tests for s2i-python
 .PHONY: test-e2e-s2i-python
-test-e2e-s2i-python: prepare-e2e-s2i
 test-e2e-s2i-python: E2E_S2I_LANGUAGE = python
 test-e2e-s2i-python: E2E_S2I_IMAGE_TAG = task-s2i-python:latest
 test-e2e-s2i-python: E2E_S2I_PARAMS_URL = https://github.com/Kalebu/Plagiarism-checker-Python
@@ -190,7 +185,6 @@ test-e2e-s2i-python: test-e2e-s2i
 
 # runs the end-to-end tests for s2i-ruby
 .PHONY: test-e2e-s2i-ruby
-test-e2e-s2i-ruby: prepare-e2e-s2i
 test-e2e-s2i-ruby: E2E_S2I_LANGUAGE = ruby
 test-e2e-s2i-ruby: E2E_S2I_IMAGE_TAG = task-s2i-ruby:latest
 test-e2e-s2i-ruby: E2E_S2I_PARAMS_URL = https://github.com/DataDog/dd-trace-rb
@@ -198,7 +192,6 @@ test-e2e-s2i-ruby: test-e2e-s2i
 
 # runs the end-to-end tests for s2i-perl
 .PHONY: test-e2e-s2i-perl
-test-e2e-s2i-perl: prepare-e2e-s2i
 test-e2e-s2i-perl: E2E_S2I_LANGUAGE = perl
 test-e2e-s2i-perl: E2E_S2I_IMAGE_TAG = task-s2i-perl:latest
 test-e2e-s2i-perl: E2E_S2I_PARAMS_URL = https://github.com/major/MySQLTuner-perl
@@ -206,7 +199,6 @@ test-e2e-s2i-perl: test-e2e-s2i
 
 # runs the end-to-end tests for s2i-php
 .PHONY: test-e2e-s2i-php
-test-e2e-s2i-php: prepare-e2e-s2i
 test-e2e-s2i-php: E2E_S2I_LANGUAGE = php
 test-e2e-s2i-php: E2E_S2I_IMAGE_TAG = task-s2i-php:latest
 test-e2e-s2i-php: E2E_S2I_PARAMS_URL = https://github.com/PuneethReddyHC/online-shopping-system-advanced
@@ -214,7 +206,6 @@ test-e2e-s2i-php: test-e2e-s2i
 
 # runs the end-to-end tests for s2i-golang
 .PHONY: test-e2e-s2i-go
-test-e2e-s2i-go: prepare-e2e-s2i
 test-e2e-s2i-go: E2E_S2I_LANGUAGE = go
 test-e2e-s2i-go: E2E_S2I_IMAGE_TAG = task-s2i-go:latest
 test-e2e-s2i-go: E2E_S2I_PARAMS_URL = https://github.com/cpuguy83/go-md2man.git
@@ -222,7 +213,6 @@ test-e2e-s2i-go: test-e2e-s2i
 
 # runs the end-to-end tests for s2i-nodejs
 .PHONY: test-e2e-s2i-nodejs
-test-e2e-s2i-nodejs: prepare-e2e-s2i
 test-e2e-s2i-nodejs: E2E_S2I_LANGUAGE = nodejs
 test-e2e-s2i-nodejs: E2E_S2I_IMAGE_TAG = task-s2i-nodejs:latest
 test-e2e-s2i-nodejs: E2E_S2I_PARAMS_URL = https://github.com/ashadnasim52/sentiment-analysis
@@ -230,7 +220,6 @@ test-e2e-s2i-nodejs: test-e2e-s2i
 
 # runs the end-to-end tests for s2i-dotnet
 .PHONY: test-e2e-s2i-dotnet
-test-e2e-s2i-dotnet: prepare-e2e-s2i
 test-e2e-s2i-dotnet: E2E_S2I_LANGUAGE = dotnet
 test-e2e-s2i-dotnet: E2E_S2I_IMAGE_TAG = task-s2i-dotnet:latest
 test-e2e-s2i-dotnet: E2E_S2I_PARAMS_URL = https://github.com/biswajitpanday/CleanArchitecture.Net6.git
@@ -240,7 +229,6 @@ test-e2e-s2i-dotnet: test-e2e-s2i
 
 # runs the end-to-end tests for s2i-java
 .PHONY: test-e2e-s2i-java
-test-e2e-s2i-java: prepare-e2e-s2i
 test-e2e-s2i-java: E2E_S2I_LANGUAGE = java
 test-e2e-s2i-java: E2E_S2I_IMAGE_TAG = task-s2i-java:latest
 test-e2e-s2i-java: E2E_S2I_PARAMS_URL = https://github.com/shashirajraja/shopping-cart
@@ -250,12 +238,10 @@ test-e2e-s2i-java: test-e2e-s2i
 
 # runs the end-to-end tests for s2i
 .PHONY: test-e2e-s2i
-test-e2e-s2i: prepare-e2e-s2i
 test-e2e-s2i: E2E_TESTS = $(E2E_TEST_DIR)/*s2i*.bats
 test-e2e-s2i: bats
 
 .PHONY: test-e2e-s2i-openshift
-test-e2e-s2i-openshift: prepare-e2e-s2i
 test-e2e-s2i-openshift: REGISTRY_URL = image-registry.openshift-image-registry.svc.cluster.local:5000
 test-e2e-s2i-openshift: REGISTRY_NAMESPACE = $(shell oc project -q)
 test-e2e-s2i-openshift: E2E_TESTS = $(E2E_TEST_DIR)/*s2i*.bats
@@ -264,9 +250,8 @@ test-e2e-s2i-openshift: bats
 # runs all the end-to-end tests against the current kubernetes context, it will required a cluster
 # with Tekton Pipelines (OpenShift Pipelines) and a container registry instance
 .PHONY: test-e2e
-test-e2e: prepare-e2e-buildah
-test-e2e: prepare-e2e-s2i
 test-e2e: test-e2e-buildah test-e2e-skopeo-copy test-e2e-s2i
+
 
 # Run all the end-to-end tests against the current openshift context.
 # It is used mainly by the CI and ideally shouldn't differ that much from test-e2e

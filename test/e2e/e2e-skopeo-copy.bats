@@ -35,5 +35,5 @@ declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
     # assering the taskrun status, making sure all steps have been successful
     assert_tekton_resource "taskrun" --partial 'All Steps have completed executing'
     # asserting the latest taskrun instacne to inspect the resources against a regular expression
-    assert_tekton_resource "taskrun" --regexp $'\S+\n?DESTINATION_DIGEST=\S+\nSOURCE_DIGEST=\S+.*'
+    assert_tekton_resource "taskrun" --regexp $'\S+\n?DESTINATION_DIGEST=\S+\nSOURCE_DIGEST=\S+'
 }

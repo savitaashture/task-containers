@@ -74,7 +74,7 @@ EOF
         --param="TLS_VERIFY=${E2E_PARAMS_TLS_VERIFY}" \
         --param="ENV_VARS=${E2E_S2I_PARAMS_ENV_VARS}" \
         --param="VERBOSE=true" \
-	--workspace name=source,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
+	      --workspace name=source,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
         --showlog >&3
     assert_success
 
@@ -84,5 +84,5 @@ EOF
     # asserting the pipelinerun status, making sure all steps have been successful
     assert_tekton_resource "pipelinerun" --partial '(Failed: 0, Cancelled 0), Skipped: 0'
     # asserting the latest taskrun instance to inspect the resources against a regular expression
-    assert_tekton_resource "taskrun" --regexp $'\S+\n?IMAGE_DIGEST=\S+.\nIMAGE_URL=\S+*'
+    assert_tekton_resource "taskrun" --regexp $'\S+\n?IMAGE_DIGEST=\S+\nIMAGE_URL=\S+'
 }

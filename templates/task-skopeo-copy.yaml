@@ -15,6 +15,11 @@ spec:
     `DESTINATION`. After copying the source and destination images SHA256 digest
     is stored as results.
 
+  workspaces:
+    - name: images_url
+      optional: true
+      description: |
+        For storing image urls in case we have more than one image to copy.
   params:
     - name: SOURCE
       type: string
@@ -25,11 +30,16 @@ spec:
       type: string
       description: |
         Fully qualified destination container image name, including tag.
-    - name: TLS_VERIFY
+    - name: SRC_TLS_VERIFY
       type: string
       default: "true"
       description: |
-        Sets the TLS verification flags, `true` is recommended.
+        Sets the TLS verification flags for SOURCE, `true` is recommended.
+    - name: DEST_TLS_VERIFY
+      type: string
+      default: "true"
+      description: |
+        Sets the TLS verification flags for DESTINATION, `true` is recommended.
     - name: VERBOSE
       type: string
       default: "false"
@@ -55,8 +65,11 @@ spec:
 {{- $variables := list
       "params.SOURCE"
       "params.DESTINATION"
-      "params.TLS_VERIFY"
+      "params.SRC_TLS_VERIFY"
+      "params.DEST_TLS_VERIFY"
       "params.VERBOSE"
+      "workspaces.images_url.bound"
+      "workspaces.images_url.path"
       "results.SOURCE_DIGEST.path"
       "results.DESTINATION_DIGEST.path"
 }}

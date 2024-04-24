@@ -10,7 +10,8 @@ declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
     # asserting all required configuration is informed
 	[ -n "${E2E_SC_PARAMS_SOURCE}" ]
     [ -n "${E2E_SC_PARAMS_DESTINATION}" ]
-    [ -n "${E2E_PARAMS_TLS_VERIFY}" ]
+    [ -n "${E2E_PARAMS_SRC_TLS_VERIFY}" ]
+    [ -n "${E2E_PARAMS_DEST_TLS_VERIFY}" ]
 
     # cleaning up all the existing resources before starting a new taskrun, the test assertion
 	# will describe the objects on the current namespace
@@ -24,8 +25,10 @@ declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
     run tkn task start skopeo-copy \
         --param="SOURCE=${E2E_SC_PARAMS_SOURCE}" \
         --param="DESTINATION=${E2E_SC_PARAMS_DESTINATION}" \
-        --param="TLS_VERIFY=${E2E_PARAMS_TLS_VERIFY}" \
+        --param="SRC_TLS_VERIFY=${E2E_PARAMS_SRC_TLS_VERIFY}" \
+        --param="DEST_TLS_VERIFY=${E2E_PARAMS_DEST_TLS_VERIFY}" \
         --param="VERBOSE=true" \
+        --workspace name=images_url,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
         --showlog
     assert_success
 

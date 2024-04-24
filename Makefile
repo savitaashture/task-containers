@@ -40,6 +40,8 @@ E2E_SC_PARAMS_DESTINATION ?= docker://$(IMAGE_BASE)/${E2E_SC_IMAGE_TAG}
 # setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
 # using the internal container registry (HTTP based)
 E2E_PARAMS_TLS_VERIFY ?= false
+E2E_PARAMS_SRC_TLS_VERIFY ?= false
+E2E_PARAMS_DEST_TLS_VERIFY ?= false
 
 # auxiliary task to create a Containerfile for buildah end-to-end testing
 E2E_BUILDAH_TASK_CONTAINERFILE_STUB ?= test/e2e/resources/task-containerfile-stub.yaml

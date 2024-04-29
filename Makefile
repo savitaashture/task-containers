@@ -31,11 +31,11 @@ IMAGE_BASE ?= $(REGISTRY_URL)/$(REGISTRY_NAMESPACE)
 
 # skopeo-copy task e2e test variables, source, destination url and tls-verify parameter.
 # Could use cgr.dev/chainguard/static as well
-E2E_SC_PARAMS_SOURCE ?= docker://docker.io/library/busybox:latest
+E2E_SC_PARAMS_SOURCE_IMAGE_URL ?= docker://docker.io/library/busybox:latest
 # end-to-end test destination image name and tag
 E2E_SC_IMAGE_TAG ?= busybox:latest
 # end-to-end test fully qualified destination image name
-E2E_SC_PARAMS_DESTINATION ?= docker://$(IMAGE_BASE)/${E2E_SC_IMAGE_TAG}
+E2E_SC_PARAMS_DESTINATION_IMAGE_URL ?= docker://$(IMAGE_BASE)/${E2E_SC_IMAGE_TAG}
 
 # setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
 # using the internal container registry (HTTP based)

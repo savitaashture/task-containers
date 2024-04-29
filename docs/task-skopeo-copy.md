@@ -7,7 +7,7 @@ Describes the Tekton Tasks supporting Skopeo-Copy
 
 # `skopeo-copy` Tekton Task
 
-The `skopeo-copy` Task is meant to replicate a container image from the `SOURCE` registry to the `DESTINATION` using [Skopeo][containersSkopeo], the Task results contain the SHA256 digests.
+The `skopeo-copy` Task is meant to replicate a container image from the `SOURCE_IMAGE_URL` registry to the `DESTINATION_IMAGE_URL` using [Skopeo][containersSkopeo], the Task results contain the SHA256 digests.
 
 # Usage
 
@@ -22,9 +22,9 @@ spec:
   taskRef:
     name: skopeo-copy
   params:
-    - name: SOURCE
+    - name: SOURCE_IMAGE_URL
       value: docker://docker.io/busybox:latest
-    - name: DESTINATION
+    - name: DESTINATION_IMAGE_URL
       value: docker://image-registry.openshift-image-registry.svc:5000/task-containers/busybox:latest
 ```
 
@@ -43,9 +43,10 @@ Then make sure the Secret is linked with the Service-Account running the `TaskRu
 
 | Param         | Type                       | Default                      | Description                |
 | :------------ | :------------------------: | :--------------------------- | :------------------------- |
-| `SOURCE` | `string` | (required) | Fully qualified source container image name, including tag, to be copied into `DESTINATION` param. |
-| `DESTINATION` | `string` | (required) | Fully qualified destination container image name, including tag. |
-| `TLS_VERIFY` | `string` | `true` | Sets the TLS verification flags, `true` is recommended. |
+| `SOURCE_IMAGE_URL` | `string` | (required) | Fully qualified source container image name, including tag, to be copied into `DESTINATION_IMAGE_URL` param. |
+| `DESTINATION_IMAGE_URL` | `string` | (required) | Fully qualified destination container image name, including tag. |
+| `SRC_TLS_VERIFY` | `string` | `true` | Sets the TLS verification flags for the source registry, `true` is recommended. |
+| `DEST_TLS_VERIFY` | `string` | `true` | Sets the TLS verification flags for the destination registry, `true` is recommended. |
 | `VERBOSE` | `string` | `false` | Shows a more verbose (debug) output. |
 
 ## Results

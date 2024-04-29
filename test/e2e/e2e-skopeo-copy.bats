@@ -2,14 +2,14 @@
 
 source ./test/helper/helper.sh
 
-declare -rx E2E_SC_PARAMS_SOURCE="${E2E_SC_PARAMS_SOURCE:-}"
-declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
+declare -rx E2E_SC_PARAMS_SOURCE_IMAGE_URL="${E2E_SC_PARAMS_SOURCE_IMAGE_URL:-}"
+declare -rx E2E_SC_PARAMS_DESTINATION_IMAGE_URL="${E2E_SC_PARAMS_DESTINATION_IMAGE_URL:-}"
 
 # Testing the skopeo-copy task,
 @test "[e2e] skopeo-copy task copying a image from source to destination registry" {
     # asserting all required configuration is informed
-	[ -n "${E2E_SC_PARAMS_SOURCE}" ]
-    [ -n "${E2E_SC_PARAMS_DESTINATION}" ]
+	[ -n "${E2E_SC_PARAMS_SOURCE_IMAGE_URL}" ]
+    [ -n "${E2E_SC_PARAMS_DESTINATION_IMAGE_URL}" ]
     [ -n "${E2E_PARAMS_SRC_TLS_VERIFY}" ]
     [ -n "${E2E_PARAMS_DEST_TLS_VERIFY}" ]
 
@@ -23,8 +23,8 @@ declare -rx E2E_SC_PARAMS_DESTINATION="${E2E_SC_PARAMS_DESTINATION:-}"
     #
 
     run tkn task start skopeo-copy \
-        --param="SOURCE=${E2E_SC_PARAMS_SOURCE}" \
-        --param="DESTINATION=${E2E_SC_PARAMS_DESTINATION}" \
+        --param="SOURCE_IMAGE_URL=${E2E_SC_PARAMS_SOURCE_IMAGE_URL}" \
+        --param="DESTINATION_IMAGE_URL=${E2E_SC_PARAMS_DESTINATION_IMAGE_URL}" \
         --param="SRC_TLS_VERIFY=${E2E_PARAMS_SRC_TLS_VERIFY}" \
         --param="DEST_TLS_VERIFY=${E2E_PARAMS_DEST_TLS_VERIFY}" \
         --param="VERBOSE=true" \

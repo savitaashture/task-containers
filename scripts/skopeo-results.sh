@@ -15,12 +15,12 @@ function skopeo_inspect() {
         "${image}"
 }
 
-phase "Extracting '${PARAMS_SOURCE}' source image digest"
-source_digest="$(skopeo_inspect "${PARAMS_SOURCE}" "${PARAMS_SRC_TLS_VERIFY}")"
+phase "Extracting '${PARAMS_SOURCE_IMAGE_URL}' source image digest"
+source_digest="$(skopeo_inspect "${PARAMS_SOURCE_IMAGE_URL}" "${PARAMS_SRC_TLS_VERIFY}")"
 phase "Source image digest '${source_digest}'"
 
-phase "Extracting '${PARAMS_DESTINATION}' destination image digest"
-destination_digest="$(skopeo_inspect "${PARAMS_DESTINATION}" "${PARAMS_DEST_TLS_VERIFY}")"
+phase "Extracting '${PARAMS_DESTINATION_IMAGE_URL}' destination image digest"
+destination_digest="$(skopeo_inspect "${PARAMS_DESTINATION_IMAGE_URL}" "${PARAMS_DEST_TLS_VERIFY}")"
 phase "Destination image digest '${destination_digest}'"
 
 printf "%s" "${source_digest}" > "${RESULTS_SOURCE_DIGEST_PATH}"

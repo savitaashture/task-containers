@@ -11,22 +11,24 @@ metadata:
 {{- end }}
 spec:
   description: |
-    Uses `skopeo copy` to replicate the `SOURCE` (param) container image into
-    `DESTINATION`. After copying the source and destination images SHA256 digest
-    is stored as results.
-
+    Skopeo is a command line tool for working with remote image registries.
+    Skopeo doesn’t require a daemon to be running while performing its operations. In particular,
+    the handy skopeo command called copy will ease the whole image copy operation. 
+    The copy command will take care of copying the image from internal.registry to production.registry.
+    If your production registry requires credentials to login in order to push the image, skopeo can handle that as well.
+    After copying the source and destination images SHA256 digest is stored as results.
   workspaces:
     - name: images_url
       optional: true
       description: |
         For storing image urls in case we have more than one image to copy.
   params:
-    - name: SOURCE
+    - name: SOURCE_IMAGE_URL
       type: string
       description: |
         Fully qualified source container image name, including tag, to be copied
-        into `DESTINATION` param.
-    - name: DESTINATION
+        into `DESTINATION_IMAGE_URL` param.
+    - name: DESTINATION_IMAGE_URL
       type: string
       description: |
         Fully qualified destination container image name, including tag.
@@ -34,12 +36,12 @@ spec:
       type: string
       default: "true"
       description: |
-        Sets the TLS verification flags for SOURCE, `true` is recommended.
+        Sets the TLS verification flags for the source registry, `true` is recommended.
     - name: DEST_TLS_VERIFY
       type: string
       default: "true"
       description: |
-        Sets the TLS verification flags for DESTINATION, `true` is recommended.
+        Sets the TLS verification flags for the destination registry, `true` is recommended.
     - name: VERBOSE
       type: string
       default: "false"
@@ -63,8 +65,8 @@ spec:
   stepTemplate:
     env:
 {{- $variables := list
-      "params.SOURCE"
-      "params.DESTINATION"
+      "params.SOURCE_IMAGE_URL"
+      "params.DESTINATION_IMAGE_URL"
       "params.SRC_TLS_VERIFY"
       "params.DEST_TLS_VERIFY"
       "params.VERBOSE"

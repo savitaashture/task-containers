@@ -18,10 +18,10 @@ jobs:
       fail-fast: false # Keep running if one leg fails.
       matrix:
         pipeline-version:
-        - v0.44.5
-        - v0.47.5
-        - v0.50.5
-        - v0.53.3
+        - v0.50.6
+        - v0.53.7
+        - v0.56.5
+        - v0.59.1
         - latest
     runs-on: ubuntu-latest
     steps:

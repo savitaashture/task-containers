@@ -9,14 +9,14 @@ images:
 # source-to-image builder images, each language represents a distinct ecosystem the builder supports,
 # sometimes it includes a specific version
 s2iBuilders:
-  python: registry.access.redhat.com/ubi8/python-39:latest
-  ruby: registry.access.redhat.com/ubi9/ruby-31:1-102
-  perl: registry.access.redhat.com/ubi9/perl-532:1-145
-  go: registry.access.redhat.com/ubi8/go-toolset:1.20.12-5.1713833129
-  nodejs: registry.access.redhat.com/ubi8/nodejs-18:latest
-  php: registry.access.redhat.com/ubi9/php-81:1-54
-  dotnet: registry.access.redhat.com/ubi8/dotnet-60:6.0-48
-  java: registry.access.redhat.com/ubi8/openjdk-11:latest
+  python: image-registry.openshift-image-registry.svc:5000/openshift/python
+  ruby: image-registry.openshift-image-registry.svc:5000/openshift/ruby
+  perl: image-registry.openshift-image-registry.svc:5000/openshift/perl
+  go: image-registry.openshift-image-registry.svc:5000/openshift/golang
+  nodejs: image-registry.openshift-image-registry.svc:5000/openshift/nodejs
+  php: image-registry.openshift-image-registry.svc:5000/openshift/php
+  dotnet: image-registry.openshift-image-registry.svc:5000/openshift/dotnet
+  java: image-registry.openshift-image-registry.svc:5000/openshift/java
 
 annotations:
   tekton.dev/pipelines.minVersion: "0.41.0"

@@ -24,6 +24,10 @@ params:
     type: string
     description: |
       Fully qualified container image name to be built by s2i.
+  - name: VERSION
+    description: The tag of go imagestream for go version
+    default: latest
+    type: string
   - name: IMAGE_SCRIPTS_URL
     type: string
     default: image:///usr/libexec/s2i         
@@ -45,6 +49,7 @@ stepTemplate:
   env:
 {{- $variables := list
       "params.IMAGE"
+      "params.VERSION"
       "params.IMAGE_SCRIPTS_URL"
       "params.CONTEXT"
       "params.FORMAT"
@@ -71,7 +76,7 @@ steps:
     workingDir: $(workspaces.source.path)
     env:
       - name: S2I_BUILDER_IMAGE
-        value: {{ $s2iBuilderImage }}
+        value: "{{ $s2iBuilderImage }}:$(params.VERSION)"
     command:
       - /scripts/s2i-generate.sh
     args:

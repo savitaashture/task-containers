@@ -25,7 +25,7 @@ params:
     description: |
       Fully qualified container image name to be built by s2i.
   - name: VERSION
-    description: The tag of go imagestream for go version
+    description: The tag of the imagestream for the corresponding language version
     default: latest
     type: string
   - name: IMAGE_SCRIPTS_URL

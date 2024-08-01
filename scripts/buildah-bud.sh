@@ -34,6 +34,12 @@ phase "Inspecting context '${PARAMS_CONTEXT}'"
 [[ ! -d "${PARAMS_CONTEXT}" ]] &&
     fail "CONTEXT param is not found at '${PARAMS_CONTEXT}', on source workspace"
 
+phase "Building build args"
+BUILD_ARGS=()
+for buildarg in "$@"; do
+    BUILD_ARGS+=("--build-arg=$buildarg")
+done
+
 # Handle optional dockerconfig secret
 if [[ "${WORKSPACES_DOCKERCONFIG_BOUND}" == "true" ]]; then
 
@@ -73,10 +79,10 @@ phase "Building '${PARAMS_IMAGE}' based on '${DOCKERFILE_FULL}'"
 
 _buildah bud ${PARAMS_BUILD_EXTRA_ARGS} \
     $ENTITLEMENT_VOLUME \
-    --no-cache \
+    "${BUILD_ARGS[@]}" \
     --file="${DOCKERFILE_FULL}" \
     --tag="${PARAMS_IMAGE}" \
-    ${PARAMS_CONTEXT}
+    "${PARAMS_CONTEXT}"
 
 if [[ "${PARAMS_SKIP_PUSH}" == "true" ]]; then
     phase "Skipping pushing '${PARAMS_IMAGE}' to the container registry!"
@@ -98,8 +104,8 @@ declare -r digest_file="/tmp/buildah-digest.txt"
 
 _buildah push ${PARAMS_PUSH_EXTRA_ARGS} \
     --digestfile="${digest_file}" \
-    ${PARAMS_IMAGE} \
-    docker://${PARAMS_IMAGE}
+    "${PARAMS_IMAGE}" \
+    "docker://${PARAMS_IMAGE}"
 
 #
 # Results

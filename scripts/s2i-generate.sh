@@ -30,6 +30,10 @@ phase "Inspecting source workspace '${WORKSPACES_SOURCE_PATH}' (PWD='${PWD}')"
 [[ "${WORKSPACES_SOURCE_BOUND}" != "true" ]] &&
     fail "Workspace 'source' is not bounded"
 
+phase "Appending $PARAMS_CONTEXT with $WORKSPACES_SOURCE_PATH if not default"
+[[ "$PARAMS_CONTEXT" != "." ]] && 
+    PARAMS_CONTEXT="${WORKSPACES_SOURCE_PATH}/${PARAMS_CONTEXT}"
+
 phase "Inspecting context '${PARAMS_CONTEXT}'"
 [[ ! -d "${PARAMS_CONTEXT}" ]] &&
     fail "Application source code directory not found at '${PARAMS_CONTEXT}'"

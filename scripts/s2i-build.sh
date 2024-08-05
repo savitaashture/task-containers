@@ -15,5 +15,13 @@ source "${cur_dir}/s2i-common.sh"
 declare -x DOCKERFILE_FULL="${S2I_DOCKERFILE}"
 source "${cur_dir}/buildah-common.sh"
 
+phase "Changing $PARAMS_CONTEXT to point to present working directory"
+[[ "$PARAMS_CONTEXT" != "." ]] && 
+    PARAMS_CONTEXT="."
+
+phase "Inspecting context '${PARAMS_CONTEXT}'"
+[[ ! -d "${PARAMS_CONTEXT}" ]] &&
+    fail "Application source code directory not found at '${PARAMS_CONTEXT}'"
+
 phase "Building the Dockerfile '${DOCKERFILE_FULL}' with buildah"
 exec ${cur_dir}/buildah-bud.sh

@@ -5,7 +5,7 @@ images:
   skopeo: registry.access.redhat.com/ubi8/skopeo:8.9
   buildah: registry.access.redhat.com/ubi8/buildah:8.9
   s2i: registry.access.redhat.com/source-to-image/source-to-image-rhel8:v1.3.9-6
-  
+
 # source-to-image builder images, each language represents a distinct ecosystem the builder supports,
 # sometimes it includes a specific version
 s2iBuilders:
@@ -23,10 +23,9 @@ annotations:
   tekton.dev/categories: containers
   tekton.dev/tags: containers
   artifacthub.io/maintainers: |
-      - name: OpenShift Pipeline task maintainers
-        email: pipelines-extcomm@redhat.com
+    - name: OpenShift Pipeline task maintainers
+      email: pipelines-extcomm@redhat.com
   artifacthub.io/provider: Red Hat
   artifacthub.io/recommendations: |
-      - url: https://tekton.dev/
+    - url: https://tekton.dev/
   artifacthub.io/category: integration-delivery
-

@@ -78,20 +78,10 @@ spec:
 {{- include "environment" ( list $variables ) | nindent 6 }}
 
   steps:
-{{- include "load_scripts" ( list . "skopeo-" ) | nindent 4 }}
-
     - name: skopeo-copy
       image: {{ .Values.images.skopeo }}
-      command:
-        - /scripts/skopeo-copy.sh
-      volumeMounts:
-        - name: scripts-dir
-          mountPath: /scripts
-
-    - name: skopeo-results
-      image: {{ .Values.images.skopeo }}
-      command:
-        - /scripts/skopeo-results.sh
+      script: |
+{{- include "load_scripts" ( list . ( list "skopeo-" ) ( list "/scripts/skopeo-copy.sh" "/scripts/skopeo-results.sh" ) ) | nindent 8 }}
       volumeMounts:
         - name: scripts-dir
           mountPath: /scripts

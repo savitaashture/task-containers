@@ -82,15 +82,13 @@ spec:
 {{- include "environment" ( list $variables ) | nindent 6 }}
 
   steps:
-{{- include "load_scripts" ( list . "buildah-" ) | nindent 4 }}
-
     - name: build
       image: {{ .Values.images.buildah }}
-      workingDir: /workspace/source
+      workingDir: $(workspaces.source.path)
       args:
         - $(params.BUILD_ARGS[*])
-      command:
-        - /scripts/buildah-bud.sh
+      script: |
+{{- include "load_scripts" ( list . ( list "buildah-" ) ( list "/scripts/buildah-bud.sh" ) ) | nindent 8 }}
       securityContext:
         capabilities:
           add: ["SETFCAP"]

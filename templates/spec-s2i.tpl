@@ -69,16 +69,14 @@ stepTemplate:
 {{- include "environment" ( list $variables ) | nindent 4 }}
 
 steps:
-{{- include "load_scripts" ( list . "buildah-" "s2i-" ) | nindent 2 }}
-
   - name: s2i-generate
     image: {{ .Values.images.s2i }}
     workingDir: $(workspaces.source.path)
     env:
       - name: S2I_BUILDER_IMAGE
         value: "{{ $s2iBuilderImage }}:$(params.VERSION)"
-    command:
-      - /scripts/s2i-generate.sh
+    script: |
+{{- include "load_scripts" ( list . ( list "buildah-" "s2i-" ) ( list "/scripts/s2i-generate.sh" ) ) | nindent 6 }}
     args:
       - "$(params.ENV_VARS[*])"
     securityContext:

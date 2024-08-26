@@ -2,8 +2,8 @@
 # task steps container images
 images:
   bash: registry.access.redhat.com/ubi8-minimal:8.9
-  skopeo: registry.access.redhat.com/ubi8/skopeo:8.9
-  buildah: registry.access.redhat.com/ubi8/buildah:8.9
+  skopeo: registry.access.redhat.com/ubi8/skopeo:8.10-5
+  buildah: registry.access.redhat.com/ubi8/buildah:8.10-5
   s2i: registry.access.redhat.com/source-to-image/source-to-image-rhel8:v1.3.9-6
 
 # source-to-image builder images, each language represents a distinct ecosystem the builder supports,

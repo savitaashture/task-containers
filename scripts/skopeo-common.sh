@@ -29,7 +29,7 @@ exported_or_fail \
 
 declare -x REGISTRY_AUTH_FILE=""
 
-docker_config="${HOME}/.docker/config.json"
+docker_config="/workspace/home/.docker/config.json"
 if [[ -f "${docker_config}" ]]; then
     phase "Setting REGISTRY_AUTH_FILE to '${docker_config}'"
     REGISTRY_AUTH_FILE=${docker_config}

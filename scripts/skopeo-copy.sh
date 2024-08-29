@@ -6,6 +6,9 @@ set -eu -o pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/skopeo-common.sh"
 
+# Ensure the /tekton/home/.docker directory exists
+mkdir -p /workspace/home/.docker
+
 phase "Copying '${PARAMS_SOURCE_IMAGE_URL}' into '${PARAMS_DESTINATION_IMAGE_URL}'"
 
 set -x

@@ -61,7 +61,7 @@ spec:
   volumes:
     - name: scripts-dir
       emptyDir: {}
-
+    
   stepTemplate:
     env:
 {{- $variables := list
@@ -79,6 +79,9 @@ spec:
 
   steps:
     - name: skopeo-copy
+      env:
+        - name: HOME
+          value: /workspace/home
       image: {{ .Values.images.skopeo }}
       script: |
 {{- include "load_scripts" ( list . ( list "skopeo-" ) ( list "/scripts/skopeo-copy.sh" "/scripts/skopeo-results.sh" ) ) | nindent 8 }}

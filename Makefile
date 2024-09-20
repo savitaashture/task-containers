@@ -66,7 +66,7 @@ E2E_S2I_LANGUAGE ?= python
 E2E_S2I_IMAGE_SCRIPTS_URL ?= image:///usr/libexec/s2i
 
 # s2i end-to-end test pipeline params adding env variables as a comma-separated string
-E2E_S2I_PARAMS_ENV_VARS ?= 
+E2E_S2I_PARAMS_ENV_VARS ?=
 
 # path to the github actions testing workflows
 ACT_WORKFLOWS ?= ./.github/workflows/test.yaml
@@ -146,7 +146,7 @@ helm-package: clean
 
 # prepares the buildah end-to-end tests, installs the required resources
 .PHONY: prepare-e2e-buildah
-prepare-e2e-buildah: 
+prepare-e2e-buildah:
 	kubectl apply -f $(E2E_BUILDAH_TASK_CONTAINERFILE_STUB)
 
 # runs bats-core against the pre-determined tests

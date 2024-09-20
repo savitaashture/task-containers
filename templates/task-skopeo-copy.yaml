@@ -21,15 +21,18 @@ spec:
     - name: images_url
       optional: true
       description: |
-        For storing image urls in case we have more than one image to copy.
+        For storing image urls in case of more than one image to copy. It must have a url.txt file at the root path
+        containing a source and a destination image separated by a space on each line.
   params:
     - name: SOURCE_IMAGE_URL
       type: string
+      default: ""
       description: |
         Fully qualified source container image name, including tag, to be copied
         into `DESTINATION_IMAGE_URL` param.
     - name: DESTINATION_IMAGE_URL
       type: string
+      default: ""
       description: |
         Fully qualified destination container image name, including tag.
     - name: SRC_TLS_VERIFY
@@ -61,7 +64,7 @@ spec:
   volumes:
     - name: scripts-dir
       emptyDir: {}
-    
+
   stepTemplate:
     env:
 {{- $variables := list

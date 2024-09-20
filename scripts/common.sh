@@ -16,7 +16,7 @@ function phase() {
     echo "---> Phase: ${*}..."
 }
 
-# assert local variables are exporeted on the environment
+# assert local variables are exported on the environment
 function exported_or_fail() {
     declare -a _required_vars="${@}"
 

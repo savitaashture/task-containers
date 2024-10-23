@@ -59,7 +59,7 @@ fi
 
 ENTITLEMENT_VOLUME=""
 if [[ "${WORKSPACES_RHEL_ENTITLEMENT_BOUND}" == "true" ]]; then
-    ENTITLEMENT_VOLUME="--volume ${WORKSPACES_RHEL_ENTITLEMENT_PATH}:/etc/pki/entitlement"
+    ENTITLEMENT_VOLUME="--volume ${WORKSPACES_RHEL_ENTITLEMENT_PATH}:/etc/pki/entitlement:ro"
 fi
 
 #

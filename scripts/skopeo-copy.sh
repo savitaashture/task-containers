@@ -16,6 +16,7 @@ if [ -n "${PARAMS_SOURCE_IMAGE_URL}" ] && [ -n "${PARAMS_DESTINATION_IMAGE_URL}"
     skopeo copy ${SKOPEO_DEBUG_FLAG} \
         --src-tls-verify="${PARAMS_SRC_TLS_VERIFY}" \
         --dest-tls-verify="${PARAMS_DEST_TLS_VERIFY}" \
+        ${PARAMS_ARGS:+${PARAMS_ARGS}} \
         "${PARAMS_SOURCE_IMAGE_URL}" \
         "${PARAMS_DESTINATION_IMAGE_URL}"
 elif [ "${WORKSPACES_IMAGES_URL_BOUND}" == "true" ]; then
@@ -27,7 +28,7 @@ elif [ "${WORKSPACES_IMAGES_URL_BOUND}" == "true" ]; then
         while IFS= read -r line || [ -n "$line" ]
         do
             read -ra SOURCE <<<"${line}"
-            skopeo copy "${SOURCE[@]}" ${SKOPEO_DEBUG_FLAG} --src-tls-verify="${PARAMS_SRC_TLS_VERIFY}" --dest-tls-verify="${PARAMS_DEST_TLS_VERIFY}"
+            skopeo copy "${SOURCE[@]}" ${SKOPEO_DEBUG_FLAG} --src-tls-verify="${PARAMS_SRC_TLS_VERIFY}" --dest-tls-verify="${PARAMS_DEST_TLS_VERIFY}" ${PARAMS_ARGS:+${PARAMS_ARGS}}
             echo "$line"
         done < "$filename"
     }

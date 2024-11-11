@@ -29,6 +29,7 @@ declare -rx E2E_SC_PARAMS_DESTINATION_IMAGE_URL="${E2E_SC_PARAMS_DESTINATION_IMA
         --param="DEST_TLS_VERIFY=${E2E_PARAMS_DEST_TLS_VERIFY}" \
         --param="VERBOSE=true" \
         --workspace name=images_url,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
+        --use-param-defaults \
         --showlog
     assert_success
 
@@ -62,6 +63,7 @@ declare -rx E2E_SC_PARAMS_DESTINATION_IMAGE_URL="${E2E_SC_PARAMS_DESTINATION_IMA
         --param="DEST_TLS_VERIFY=${E2E_PARAMS_DEST_TLS_VERIFY}" \
         --param="VERBOSE=false" \
         --workspace name=images_url,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
+        --use-param-defaults \
         --showlog
     assert_success
 
@@ -117,5 +119,75 @@ declare -rx E2E_SC_PARAMS_DESTINATION_IMAGE_URL="${E2E_SC_PARAMS_DESTINATION_IMA
     # assering the taskrun status, making sure all steps have been successful
     assert_tekton_resource "taskrun" --partial 'All Steps have completed executing'
     # asserting the latest taskrun instacne to inspect the resources against a regular expression
+    assert_tekton_resource "taskrun" --regexp $'\S+\n?DESTINATION_DIGEST=\S+\nSOURCE_DIGEST=\S+'
+}
+
+# Testing the skopeo-copy task, args = "--all"
+@test "[e2e] skopeo-copy task copying a image from source to destination registry with args set to '--all' " {
+    # asserting all required configuration is informed
+	[ -n "${E2E_SC_PARAMS_SOURCE_IMAGE_URL}" ]
+    [ -n "${E2E_SC_PARAMS_DESTINATION_IMAGE_URL}" ]
+    [ -n "${E2E_PARAMS_SRC_TLS_VERIFY}" ]
+    [ -n "${E2E_PARAMS_DEST_TLS_VERIFY}" ]
+
+    # cleaning up all the existing resources before starting a new taskrun, the test assertion
+	# will describe the objects on the current namespace
+    run kubectl delete taskrun --all
+    assert_success
+
+    #
+    # E2E TaskRun
+    #
+
+    run tkn task start skopeo-copy \
+        --param="SOURCE_IMAGE_URL=${E2E_SC_PARAMS_SOURCE_IMAGE_URL}" \
+        --param="DESTINATION_IMAGE_URL=${E2E_SC_PARAMS_DESTINATION_IMAGE_URL}" \
+        --param="SRC_TLS_VERIFY=${E2E_PARAMS_SRC_TLS_VERIFY}" \
+        --param="DEST_TLS_VERIFY=${E2E_PARAMS_DEST_TLS_VERIFY}" \
+        --param="VERBOSE=true" \
+        --param="ARGS=${E2E_SC_PARAMS_ARGS}" \
+        --workspace name=images_url,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
+        --use-param-defaults \
+        --showlog
+    assert_success
+
+    # asserting the taskrun status, making sure all steps have been successful
+    assert_tekton_resource "taskrun" --partial 'All Steps have completed executing'
+    # asserting the latest taskrun instance to inspect the resources against a regular expression
+    assert_tekton_resource "taskrun" --regexp $'\S+\n?DESTINATION_DIGEST=\S+\nSOURCE_DIGEST=\S+'
+}
+
+# Testing the skopeo-copy task, args = "--all --preserve-digests"
+@test "[e2e] skopeo-copy task copying a image from source to destination registry with args set to '--all --preserve-digests'" {
+    # asserting all required configuration is informed
+    [ -n "${E2E_SC_PARAMS_SOURCE_IMAGE_URL}" ]
+    [ -n "${E2E_SC_PARAMS_DESTINATION_IMAGE_URL}" ]
+    [ -n "${E2E_PARAMS_SRC_TLS_VERIFY}" ]
+    [ -n "${E2E_PARAMS_DEST_TLS_VERIFY}" ]
+
+    # cleaning up all the existing resources before starting a new taskrun, the test assertion
+    # will describe the objects on the current namespace
+    run kubectl delete taskrun --all
+    assert_success
+
+    #
+    # E2E TaskRun
+    #
+
+    run tkn task start skopeo-copy \
+        --param="SOURCE_IMAGE_URL=${E2E_SC_PARAMS_SOURCE_IMAGE_URL}" \
+        --param="DESTINATION_IMAGE_URL=${E2E_SC_PARAMS_DESTINATION_IMAGE_URL}" \
+        --param="SRC_TLS_VERIFY=${E2E_PARAMS_SRC_TLS_VERIFY}" \
+        --param="DEST_TLS_VERIFY=${E2E_PARAMS_DEST_TLS_VERIFY}" \
+        --param="VERBOSE=true" \
+        --param="ARGS=--all --preserve-digests" \
+        --workspace name=images_url,volumeClaimTemplateFile=./test/e2e/resources/workspace-template.yaml \
+        --use-param-defaults \
+        --showlog
+    assert_success
+
+    # asserting the taskrun status, making sure all steps have been successful
+    assert_tekton_resource "taskrun" --partial 'All Steps have completed executing'
+    # asserting the latest taskrun instance to inspect the resources against a regular expression
     assert_tekton_resource "taskrun" --regexp $'\S+\n?DESTINATION_DIGEST=\S+\nSOURCE_DIGEST=\S+'
 }

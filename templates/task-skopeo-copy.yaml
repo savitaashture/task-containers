@@ -50,6 +50,11 @@ spec:
       default: "false"
       description: |
         Shows a more verbose (debug) output.
+    - name: ARGS
+      default: ""
+      type: string
+      description: |
+        Additional args for skopeo copy command
 
   results:
     - name: SOURCE_DIGEST
@@ -73,6 +78,7 @@ spec:
       "params.SRC_TLS_VERIFY"
       "params.DEST_TLS_VERIFY"
       "params.VERBOSE"
+      "params.ARGS"
       "workspaces.images_url.bound"
       "workspaces.images_url.path"
       "results.SOURCE_DIGEST.path"

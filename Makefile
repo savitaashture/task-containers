@@ -36,6 +36,8 @@ E2E_SC_PARAMS_SOURCE_IMAGE_URL ?= docker://docker.io/library/busybox:latest
 E2E_SC_IMAGE_TAG ?= busybox:latest
 # end-to-end test fully qualified destination image name
 E2E_SC_PARAMS_DESTINATION_IMAGE_URL ?= docker://$(IMAGE_BASE)/${E2E_SC_IMAGE_TAG}
+# --all argument for skopeo copy command
+E2E_SC_PARAMS_ARGS ?= --all
 
 # setting tls-verify as false disables the HTTPS client as well, something we need for e2e testing
 # using the internal container registry (HTTP based)

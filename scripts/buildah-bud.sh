@@ -10,7 +10,7 @@ source "$(dirname ${BASH_SOURCE[0]})/common.sh"
 source "$(dirname ${BASH_SOURCE[0]})/buildah-common.sh"
 
 function _buildah() {
-    buildah \
+    eval buildah \
         --storage-driver="${PARAMS_STORAGE_DRIVER}" \
         --tls-verify="${PARAMS_TLS_VERIFY}" \
         ${*}

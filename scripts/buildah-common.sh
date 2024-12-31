@@ -26,9 +26,14 @@ declare -rx RESULTS_IMAGE_URL_PATH="${RESULTS_IMAGE_URL_PATH:-}"
 
 # exposing the full path to the container file, which by default should be relative to the primary
 # workspace, to receive a different container-file location
-declare -r dockerfile_on_ws="${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}"
-declare -x DOCKERFILE_FULL="${DOCKERFILE_FULL:-${dockerfile_on_ws}}"
 
+# Addresses the issue of ignoring context values when they are provided where `.` is a default value
+if [ -n "$PARAMS_CONTEXT" ] && [ "$PARAMS_CONTEXT" != "." ]; then
+  declare -r dockerfile_on_ws="${WORKSPACES_SOURCE_PATH}/${PARAMS_CONTEXT}/${PARAMS_DOCKERFILE}"
+else
+  declare -r dockerfile_on_ws="${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}"
+fi
+declare -x DOCKERFILE_FULL="${DOCKERFILE_FULL:-${dockerfile_on_ws}}"
 #
 # Asserting Environment
 #

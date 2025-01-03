@@ -3,4 +3,4 @@ apiVersion: v2
 name: task-containers
 description: Contains the Tekton Tasks to manage container images
 type: application
-version: 0.5.0
+version: 0.5.1

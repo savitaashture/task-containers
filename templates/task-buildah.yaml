@@ -44,12 +44,6 @@ spec:
       default: ./Dockerfile
       description: |
         Path to the `Dockerfile` (or `Containerfile`) relative to the `source` workspace.
-    - name: BUILD_ARGS
-      type: array
-      default:
-        - ""
-      description: |
-        Dockerfile build arguments, array of key=value
 
 {{- include "params_buildah_common" . | nindent 4 }}
 {{- include "params_common" . | nindent 4 }}
@@ -85,8 +79,6 @@ spec:
     - name: build
       image: {{ .Values.images.buildah }}
       workingDir: $(workspaces.source.path)
-      args:
-        - $(params.BUILD_ARGS[*])
       script: |
 {{- include "load_scripts" ( list . ( list "buildah-" ) ( list "/scripts/buildah-bud.sh" ) ) | nindent 8 }}
       securityContext:

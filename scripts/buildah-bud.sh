@@ -10,10 +10,10 @@ source "$(dirname ${BASH_SOURCE[0]})/common.sh"
 source "$(dirname ${BASH_SOURCE[0]})/buildah-common.sh"
 
 function _buildah() {
-    eval buildah \
+    buildah \
         --storage-driver="${PARAMS_STORAGE_DRIVER}" \
         --tls-verify="${PARAMS_TLS_VERIFY}" \
-        ${*}
+        "$@"
 }
 
 #
@@ -77,7 +77,15 @@ phase "Building '${PARAMS_IMAGE}' based on '${DOCKERFILE_FULL}'"
 [[ -n "${PARAMS_BUILD_EXTRA_ARGS}" ]] &&
     phase "Extra 'buildah bud' arguments informed: '${PARAMS_BUILD_EXTRA_ARGS}'"
 
-_buildah bud ${PARAMS_BUILD_EXTRA_ARGS} \
+# Process BUILD_EXTRA_ARGS
+build_extra_args_tmp=$(echo "${PARAMS_BUILD_EXTRA_ARGS:-}" | xargs -n1)
+if [[ -n "$build_extra_args_tmp" ]]; then
+    readarray -t build_extra_args <<< "$build_extra_args_tmp"
+else
+    build_extra_args=() # Empty array if no extra args
+fi
+
+_buildah bud "${build_extra_args[@]}" \
     $ENTITLEMENT_VOLUME \
     "${BUILD_ARGS[@]}" \
     --file="${DOCKERFILE_FULL}" \
@@ -96,13 +104,21 @@ fi
 phase "Pushing '${PARAMS_IMAGE}' to the container registry"
 
 [[ -n "${PARAMS_PUSH_EXTRA_ARGS}" ]] &&
-    phase "Extra 'buildah bud' arguments informed: '${PARAMS_PUSH_EXTRA_ARGS}'"
+    phase "Extra 'buildah push' arguments informed: '${PARAMS_PUSH_EXTRA_ARGS}'"
 
 # temporary file to store the image digest, information only obtained after pushing the image to the
 # container registry
 declare -r digest_file="/tmp/buildah-digest.txt"
 
-_buildah push ${PARAMS_PUSH_EXTRA_ARGS} \
+# Process PUSH_EXTRA_ARGS
+push_extra_args_tmp=$(echo "${PARAMS_PUSH_EXTRA_ARGS:-}" | xargs -n1)
+if [[ -n "$push_extra_args_tmp" ]]; then
+    readarray -t push_extra_args <<< "$push_extra_args_tmp"
+else
+    push_extra_args=() # Empty array if no extra args
+fi
+
+_buildah push "${push_extra_args[@]}" \
     --digestfile="${digest_file}" \
     "${PARAMS_IMAGE}" \
     "docker://${PARAMS_IMAGE}"

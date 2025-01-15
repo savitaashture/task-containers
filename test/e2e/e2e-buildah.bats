@@ -39,4 +39,24 @@ declare -rx E2E_BUILDAH_PARAMS_IMAGE="${E2E_BUILDAH_PARAMS_IMAGE:-}"
     assert_tekton_resource "pipelinerun" --partial '(Failed: 0, Cancelled 0), Skipped: 0'
     # asserting the latest taskrun instacne to inspect the resources against a regular expression
     assert_tekton_resource "taskrun" --regexp $'\S+\n?IMAGE_DIGEST=\S+\nIMAGE_URL=\S+'
+
+    # cleaning up all the existing resources before starting a new taskrun, the test assertion
+    # will describe the objects on the current namespace
+    run kubectl delete taskrun --all
+    assert_success
+
+    run kubectl delete pipelinerun --all
+    assert_success
+
+    #
+    # Testing BUILD_EXTRA_ARGS params
+    #
+    run kubectl delete -f ./test/e2e/resources/cm-build-extra-args-test.yaml
+    run kubectl apply -f ./test/e2e/resources/cm-build-extra-args-test.yaml
+
+    run kubectl apply -f ./test/e2e/resources/taskrun.yaml
+
+    # waiting a few seconds before asserting results
+    sleep 30
+    assert_success
 }

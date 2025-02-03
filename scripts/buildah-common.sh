@@ -24,10 +24,16 @@ declare -rx RESULTS_IMAGE_URL_PATH="${RESULTS_IMAGE_URL_PATH:-}"
 # Dockerfile
 #
 
-# exposing the full path to the container file, which by default should be relative to the primary
-# workspace, to receive a different container-file location
-declare -r dockerfile_on_ws="${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}"
-declare -x DOCKERFILE_FULL="${DOCKERFILE_FULL:-${dockerfile_on_ws}}"
+# Dual-check for the Dockerfile:
+# First, if a non-default build context is provided and the Dockerfile exists there, use that.
+if [ -n "${PARAMS_CONTEXT}" ] && [ "${PARAMS_CONTEXT}" != "." ] && [ -f "${WORKSPACES_SOURCE_PATH}/${PARAMS_CONTEXT}/${PARAMS_DOCKERFILE}" ]; then
+    declare -r DOCKERFILE_FULL="${WORKSPACES_SOURCE_PATH}/${PARAMS_CONTEXT}/${PARAMS_DOCKERFILE}"
+# Otherwise, check in the workspace (source) root.
+elif [ -f "${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}" ]; then
+    declare -r DOCKERFILE_FULL="${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}"
+else
+    fail "Dockerfile not found in either ${WORKSPACES_SOURCE_PATH}/${PARAMS_CONTEXT}/${PARAMS_DOCKERFILE} or ${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}"
+fi
 
 #
 # Asserting Environment

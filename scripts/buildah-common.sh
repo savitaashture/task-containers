@@ -26,7 +26,7 @@ declare -rx RESULTS_IMAGE_URL_PATH="${RESULTS_IMAGE_URL_PATH:-}"
 
 # Exposing the full path to the container file, which by default should be relative to the primary
 # workspace, with a fallback to be relative to the context directory.
-if [[ -z "$DOCKERFILE_FULL" ]]; then
+if [[ -z "${DOCKERFILE_FULL:-}" ]]; then
     if [[ -r "${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}" ]]; then
         declare -x DOCKERFILE_FULL="${WORKSPACES_SOURCE_PATH}/${PARAMS_DOCKERFILE}"
     else

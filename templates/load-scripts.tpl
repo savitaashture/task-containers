@@ -20,6 +20,6 @@ chmod +x /scripts/{{ $prefix }}*.sh;
 
 {{- range $i, $script := index . 2 -}}
 echo "Running Script {{ $script }}";
-  {{ $script }};
+  {{ $script }} "$@";
 {{- end }}
 {{- end -}}

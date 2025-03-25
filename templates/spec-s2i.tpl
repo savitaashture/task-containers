@@ -30,7 +30,7 @@ params:
     type: string
   - name: IMAGE_SCRIPTS_URL
     type: string
-    default: image:///usr/libexec/s2i         
+    default: {{ default "image:///usr/libexec/s2i" .Values.IMAGE_SCRIPTS_URL | quote }}
     description: |
       Specify a URL containing the default assemble and run scripts for the builder image
   - name: ENV_VARS

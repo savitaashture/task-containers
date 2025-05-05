@@ -1,0 +1,25 @@
+---
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: test-build-args-task
+spec:
+  params:
+    - name: IMAGE
+      value: "test:latest"
+    - name: TLS_VERIFY
+      value: "false"
+    - name: VERBOSE
+      value: "true"
+    - name: BUILD_ARGS
+      value:
+        - EXTRA_ARGS_TEST="abc def"
+    - name: SKIP_PUSH
+      value: "true"
+  serviceAccountName: pipeline
+  taskRef:
+    name: buildah
+  workspaces:
+    - name: source
+      configMap:
+        name: test-extra-args

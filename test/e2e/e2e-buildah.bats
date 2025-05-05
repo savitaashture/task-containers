@@ -59,4 +59,25 @@ declare -rx E2E_BUILDAH_PARAMS_IMAGE="${E2E_BUILDAH_PARAMS_IMAGE:-}"
     # waiting a few seconds before asserting results
     sleep 30
     assert_success
+
+    # cleaning up all the existing resources before starting a new taskrun, the test assertion
+    # will describe the objects on the current namespace
+    run kubectl delete taskrun --all
+    assert_success
+
+    run kubectl delete pipelinerun --all
+    assert_success
+
+
+    #
+    # Testing BUILD_ARGS params
+    #
+    run kubectl delete -f ./test/e2e/resources/cm-build-extra-args-test.yaml
+    run kubectl apply -f ./test/e2e/resources/cm-build-extra-args-test.yaml
+
+    run kubectl apply -f ./test/e2e/resources/build-arg-taskrun.yaml
+
+    # waiting a few seconds before asserting results
+    sleep 30
+    assert_success
 }

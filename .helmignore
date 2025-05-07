@@ -10,8 +10,4 @@
 /Makefile
 /OWNERS
 /test/
-/hack/
-/ci/
-/automation/
-/scripts/
 /.bin
